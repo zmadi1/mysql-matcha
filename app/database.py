@@ -3,7 +3,6 @@ import mysql.connector
 from flask import jsonify,abort,make_response,render_template,url_for,flash,g, redirect,session,request,make_response
 from app import app
 from flask_bcrypt import Bcrypt
-from bson.objectid import ObjectId
 from datetime import datetime
 import secrets
 import os

@@ -15,9 +15,7 @@ from app.database import *
 import secrets
 import os
 import json
-import bson
 import random
-from bson import json_util,ObjectId
 from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO,send,emit,join_room, leave_room
 import time
