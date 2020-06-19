@@ -3,16 +3,21 @@
 # Setup
 
 virtualenv -p python3 magic/
+
 source magic/bin/activate
+
 pip install -r requirements.txt
 
 # Running
 export FLASK_APP=run.py
+
 export FLASK_ENV=development
+
 flask run
 
 # Side Note 
 Spider man please create a git ignore as follows:
+
 nano or vim .gitignore                //then add the following folders only
 __pycache__
 magic/                              //or whatever you named your virtual environment
