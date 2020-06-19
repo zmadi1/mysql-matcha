@@ -20,7 +20,7 @@ Spider man please create a git ignore as follows:
 
 nano or vim .gitignore                //then add the following folders only
 
-__pycache__
+__ pycache __                         //without the spaces between the underscores and letters  
 
 magic/                              //or whatever you named your virtual environment
 
