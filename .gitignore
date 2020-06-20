@@ -1,2 +1,11 @@
 # created by virtualenv automatically
-*
+
+__pycache__  
+README.md
+run.py
+bin  
+lib        
+pyvenv.cfg   
+
+
+
