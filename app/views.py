@@ -851,7 +851,7 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-                                    print(pic)
+                                    print(pic[0])
                                     print('-----------------------')
                                     print(picture)
                                     # if pic[0] == 
@@ -859,8 +859,7 @@ def profile():
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
-        for i in posts:
-            print(i[0])
+
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()
