@@ -576,7 +576,7 @@ def registration():
         print('hello')
         token = session.get("TOKEN")
         print("Here")
-        msg = Message('Confirm Email',sender='mzekemadi@gmail.com', recipients=[email])
+        msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
         
         link  = url_for('confirm_email',token=token, _external=True)
         
