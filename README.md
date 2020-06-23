@@ -19,7 +19,7 @@ flask run
 Open your web browser on localhost
 
 # Troubleshooting
-In the unfortunate event that you receive a "Access denied for user 'root@localhost'" perform the following:
+In the unfortunate event that you receive a "Access denied for user 'root@localhost' error" perform the following:
 
 $ sudo mysql
 > use mysql
