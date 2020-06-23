@@ -22,7 +22,7 @@ import time
 from time import localtime,strftime
 # from flask_socketio import SocketIO
 # from flask_mail import Mail,Message
-# from itsdangerous import SignatureExpired, URLSafeTimedSerializer
+from itsdangerous import SignatureExpired, URLSafeTimedSerializer
 
 # bcrypt = Bcrypt(app)
 mail = Mail(app)
