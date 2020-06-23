@@ -7,10 +7,14 @@ from datetime import datetime
 import secrets
 import os
 from flask_paginate import Pagination,get_page_parameter
+from flask_mail import Mail,Message
+from itsdangerous import SignatureExpired, URLSafeTimedSerializer
+
 bcrypt = Bcrypt(app)
+# mail = Mail(app)
 
 
-
+s = URLSafeTimedSerializer('thisissecret')
 class sqlmgr:
     #initialize parameters for connection estaablishment
     def __init__(self,user,pwd,db,host='localhost',IgnoreError=False):
@@ -242,6 +246,10 @@ def create_users(form):
     lastname = form.lastname.data
     password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
+    token = s.dumps(email,salt='email-confirm')
+
+    print(token)
+
     try:
         with sqlmgr(user="root",pwd="",db='') as cnx:
             cursor=cnx.cursor()
@@ -273,6 +281,7 @@ def create_users(form):
             sexualPreference VARCHAR(20),
             AccountVerification BOOLEAN,
             Interest TEXT,
+            tokenCode VARCHAR(200),
             PRIMARY KEY(user_id)
             )
            """
@@ -339,20 +348,27 @@ def create_users(form):
             cursor.execute(count_email(email))
             email_number = cursor.fetchone()
             
+            print(f'Here we are checking {token}')
+            session["TOKEN"] = token
+            print('This is a newly created session')
+            print(session.get("TOKEN"))
             if user_number[0] != 1:
                 
                 if email_number[0] != 1:
+
+                    print(session.get("TOKEN"))
                     cursor.execute(
                     f"""INSERT INTO  
-                    `users`(`user_id`,`username`,`firstname`,`lastname`,`email`,`password`,`registered`,`AccountVerification`)
-                    VALUES('{user_id}','{username}','{firstname}','{lastname}','{email}','{password}',FALSE,FALSE)""")
+                    `users`(`user_id`,`username`,`firstname`,`lastname`,`email`,`password`,`registered`,`AccountVerification`,`tokenCode`)
+                    VALUES('{user_id}','{username}','{firstname}','{lastname}','{email}','{password}',FALSE,FALSE,'{token}')""")
+                    cnx.commit()
+                    return True
                 else:
                     flash('The email have been taken,please try a different one','danger')
+                    return False
             else:
                 flash('The username have been taken,please try a different one','danger')
-            cnx.commit()
         except:
             pass
             # flash('The username or the email have been taken,please try a different one','danger')
-       
         cursor.close()

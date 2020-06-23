@@ -10,7 +10,7 @@ from operator import itemgetter
 import datetime
 
 from flask_login import LoginManager
-from app.forms import RegistrationForm,PostForm, LoginForm, UpdateAccountForm, UploadsForm, MessageForm
+from app.forms import RegistrationForm,PostForm, LoginForm, UpdateAccountForm, UploadsForm, MessageForm,ForgotForm
 from app.database import *
 import secrets
 import os
@@ -21,6 +21,12 @@ from flask_socketio import SocketIO,send,emit,join_room, leave_room
 import time
 from time import localtime,strftime
 # from flask_socketio import SocketIO
+# from flask_mail import Mail,Message
+# from itsdangerous import SignatureExpired, URLSafeTimedSerializer
+
+# bcrypt = Bcrypt(app)
+mail = Mail(app)
+
 
 
 geod = pyproj.Geod(ellps='WGS84')
@@ -151,6 +157,12 @@ ROOMS = ["lounge","news","games","coding"]
 
     # return render_template('admin/dash_board.html')
 
+@app.route('/forgotpass')
+def forgot_pass():
+
+    form = ForgotForm()
+
+    return render_template('public/forgotpass.html',form=form)
 
 
 @socketio.on('join')
@@ -549,11 +561,67 @@ def query():
 @app.route('/registration',methods=['POST','GET'])
 def registration():
     form=RegistrationForm()
+
     if request.method =='POST':
         create_users(form)
-        # create_post(form)
+        email = form.email.data
+
+        # print(session.get("token"))
+        # print(token)
+        # print('Hellooooooooooooo')
+        # print(token)
+        # for key in request.session.keys():
+        #     print("key:=>" + request.session[key])
+
+        print('hello')
+        token = session.get("TOKEN")
+        print("Here")
+        msg = Message('Confirm Email',sender='mzekemadi@gmail.com', recipients=[email])
+        
+        link  = url_for('confirm_email',token=token, _external=True)
+        
+        msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
+
+        mail.send(msg)
+        #    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        # cursor=cnx.cursor()
+    
+        # cursor.execute(f"SELECT COUNT(`picture`) FROM `pictures` WHERE `user_id`='{id}'")
+        # picture = cursor.fetchone()
+    
+
         return redirect(url_for('login'))
     return render_template('public/registration.html',form=form,title='SignUp')
+
+
+#email verification
+@app.route('/confirm_email/<token>')
+def confirm_email(token):
+
+  
+
+    # Get user by username
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+    
+        cursor.execute(f"SELECT COUNT(user_id) FROM `users` WHERE `tokenCode`= '{token}'")
+        check_token = cursor.fetchone()
+
+        print("Helllakdjfaldklfakdla_________________________________________________")
+        print(check_token[0])
+
+        try:
+            if check_token[0] > 0:
+                cursor.execute(f"UPDATE `users` SET  `AccountVerification` = 1 WHERE `tokenCode` = '{token}'")
+                cnx.commit()
+                # Close connection
+                # token = s.dumps(email,salt='email-confirm')
+                email = s.loads(token,salt='email-confirm', max_age=600)
+                return redirect(url_for('login'))
+        except SignatureExpired:
+            return 'nothing was the same'
+    return "success"
 
 
 @app.route('/login',methods=['POST','GET'])
