@@ -859,8 +859,6 @@ def profile():
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
-        
-        
         for i in posts:
             print(i[0])
         # interest_return = list(dict.fromkeys(interest_return))

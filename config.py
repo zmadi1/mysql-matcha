@@ -21,6 +21,15 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DEBUG = True
     SECRET_KEY = 'the waters'
+    
+    
+    #init email
+    MAIL_SERVER='smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USERNAME = 'mzekemadi@gmail.com'
+    MAIL_PASSWORD = '181991Ma'
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
 
     DB_NAME="develpment-db"
     DB_USERNAME="root"
