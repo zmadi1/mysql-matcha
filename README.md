@@ -23,8 +23,11 @@ In the unfortunate event that you receive a "Access denied for user 'root@localh
 
 $ sudo mysql
 > use mysql
+
 > update user set plugin='' where user='root';
+
 > flush privileges
+
 > exit or ctrl+D
 
 That should resolve the error.
