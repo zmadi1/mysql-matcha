@@ -22,7 +22,7 @@ import time
 from time import localtime,strftime
 # from flask_socketio import SocketIO
 # from flask_mail import Mail,Message
-# from itsdangerous import SignatureExpired, URLSafeTimedSerializer
+from itsdangerous import SignatureExpired, URLSafeTimedSerializer
 
 # bcrypt = Bcrypt(app)
 mail = Mail(app)
@@ -610,7 +610,7 @@ def registration():
         print('hello')
         token = session.get("TOKEN")
         print("Here")
-        msg = Message('Confirm Email',sender='mzekemadi@gmail.com', recipients=[email])
+        msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
         
         link  = url_for('confirm_email',token=token, _external=True)
         
@@ -886,18 +886,28 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
+<<<<<<< HEAD
                                     # print(pic)
                                     # print('-----------------------')
                                     # print(picture)
+=======
+                                    print(pic[0])
+                                    print('-----------------------')
+                                    print(picture)
+>>>>>>> 06cd5a6cd062311fcf2464363501c738d43ff18d
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
+<<<<<<< HEAD
         
         
         # for i in posts:
             # print(i[0])
+=======
+
+>>>>>>> 06cd5a6cd062311fcf2464363501c738d43ff18d
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()
