@@ -294,35 +294,69 @@ def handle_event(data):
 
 @socketio.on('like')
 def handle_my_custom_event(data):
-
+    likes_id = secrets.token_urlsafe()
+    liked_id = secrets.token_urlsafe()
     # getting the usernames
     username = data['owner']
-    post_id = data['user']
+    other_username = data['user']
 
-    print(f"This belong to {post_id}")
+    print(f"This belong to {other_username}")
 
-    #getting the current user
+    # getting the current user
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor() 
+        cursor.execute(f"SELECT * FROM `users` WHERE `username`='{username}'")
+        
+        user = cursor.fetchall()
+    print('-------------------------------------------------------')
+    print(user[0][1])
+    print('--------------------------------------------------------')
+
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor() 
+        cursor.execute(f"SELECT * FROM `users` WHERE `username`='{other_username}'")
+        
+        other_user = cursor.fetchall()
+
+    print(f"This is the other user {other_user[0][1]}")
+    # | likes_id | varchar(100) | NO   | PRI | NULL    |       |
+# | user_id  | varchar(200) | NO   | MUL | NULL    |       |
+# | picture  | varchar(100)
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{user[0][1]}')")
+        
+        cnx.commit()
+
+        
     # prev = find_user(username)
     # prev_liked = prev['likes']
     
     #Recording that i have liked someone
-    push_user_likes(username,data)
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{other_user[0][1]}')")
+        
+        cnx.commit()
+    # push_user_likes(username,data)
 
     #Recording that someone has liked me
-    push_user_liked_you(post_id,data)
+    # push_user_liked_you(post_id,data)
 
     #getting the current user to check
     #whether someone has liked their profile
-    old_user = find_user(post_id)
+    # old_user = find_user(post_id)
 
     #checking whether someone has liked my profile
-    print(old_user)
-    if old_user != None:
-        old_noti_user = len(old_user['liked'])
+    # print(old_user)
+    # if old_user != None:
+        # old_noti_user = len(old_user['liked'])
 
     #updating notification that someone has liked my profile
-    if old_user != None:
-        notification_update( old_user['username'],old_noti_user)
+    # if old_user != None:
+        # notification_update( old_user['username'],old_noti_user)
 
     # current = find_user(username)
 
@@ -335,7 +369,7 @@ def handle_my_custom_event(data):
    
     # number = noti['notification']
 
-    socketio.emit('Notification',data,room=post_id)
+    socketio.emit('Notification',data,room=other_username)
 
 # @socketio.on('profile')
 # def profile(data):
@@ -760,6 +794,7 @@ def upload_image():
 @app.route('/profile',methods=['GET','POST'])
 def profile():
 
+    # print("where am i printing this?")
     if session.get('USER',None) is not None:
 
         id=session.get("USER")
@@ -782,8 +817,8 @@ def profile():
             cursor.execute("SELECT * FROM users")
             all_user = cursor.fetchall()
             
-        for j in all_user:
-            print(j[13])
+        # for j in all_user:
+            # print(j[13])
         if profile_pic is None:
             profile = "user.png"
         else:
@@ -851,9 +886,9 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-                                    print(pic)
-                                    print('-----------------------')
-                                    print(picture)
+                                    # print(pic)
+                                    # print('-----------------------')
+                                    # print(picture)
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
@@ -861,8 +896,8 @@ def profile():
         
         
         
-        for i in posts:
-            print(i[0])
+        # for i in posts:
+            # print(i[0])
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()
@@ -889,7 +924,7 @@ def profile():
             # response = make_response(jsonify(req))
             # return response
 
-    return render_template('public/profile.html',posts=posts,profile=profile, users=users, user=session["USER"],username=username)
+    return render_template('public/profile.html',existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username)
     # else:
         # print("Userename not found in session")
         # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
