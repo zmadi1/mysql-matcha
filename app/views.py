@@ -674,12 +674,13 @@ def reset_passwd():
             mail.send(msg)
             return redirect(url_for('login'))
 
-@app.route('/changer', methods=['POST','GET'])
-def changer():
-     
+# @app.route('/changer', methods=['POST','GET'])
+# def changer():
+
+
 @app.route('/login',methods=['POST','GET'])
 def login():
-
+    
     form=LoginForm()
     if request.method== 'POST':
         try:
@@ -836,7 +837,7 @@ def profile():
             cursor.execute("SELECT * FROM users")
             all_user = cursor.fetchall()
             
-        # for j in all_user:
+        # for j in all_user:git merge --abort
             # print(j[13])
         if profile_pic is None:
             profile = "user.png"
@@ -905,28 +906,14 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-<<<<<<< HEAD
-                                    # print(pic)
-                                    # print('-----------------------')
-                                    # print(picture)
-=======
                                     print(pic[0])
                                     print('-----------------------')
                                     print(picture)
->>>>>>> 06cd5a6cd062311fcf2464363501c738d43ff18d
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
-<<<<<<< HEAD
-        
-        
-        # for i in posts:
-            # print(i[0])
-=======
-
->>>>>>> 06cd5a6cd062311fcf2464363501c738d43ff18d
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()
