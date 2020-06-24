@@ -340,6 +340,21 @@ def handle_my_custom_event(data):
 
     #getting the current user to check
     #whether someone has liked their profile
+    
+    
+   
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{user[0][0]}'")
+        
+        old_user=cursor.fetchall()
+        cnx.commit()
+    
+    print('-------=-=======0-=-=-=-==-=-=')
+    print(user[0][0])
+    print('********************************')  
+    print(old_user)
+        # cnx.commit()
     # old_user = find_user(post_id)
 
     #checking whether someone has liked my profile
@@ -348,6 +363,10 @@ def handle_my_custom_event(data):
         # old_noti_user = len(old_user['liked'])
 
     #updating notification that someone has liked my profile
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE `username`='{user[0][1]}'")
     # if old_user != None:
         # notification_update( old_user['username'],old_noti_user)
 
@@ -906,27 +925,18 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-<<<<<<< HEAD
                                     # print(pic)
                                     # print('-----------------------')
                                     # print(picture)
-=======
-                                    print(pic[0])
-                                    print('-----------------------')
-                                    print(picture)
->>>>>>> cf83b446d1c433a12dd7346c482371455b6627c3
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
-<<<<<<< HEAD
         
         
         # for i in posts:
             # print(i[0])
-=======
->>>>>>> cf83b446d1c433a12dd7346c482371455b6627c3
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()

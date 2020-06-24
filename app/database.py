@@ -284,6 +284,8 @@ def create_users(form):
             AccountVerification BOOLEAN,
             Interest TEXT,
             tokenCode VARCHAR(200),
+            notification INT,
+            notification_numb INT,
             PRIMARY KEY(user_id)
             )
            """
@@ -361,8 +363,8 @@ def create_users(form):
                     print(session.get("TOKEN"))
                     cursor.execute(
                     f"""INSERT INTO  
-                    `users`(`user_id`,`username`,`firstname`,`lastname`,`email`,`password`,`registered`,`AccountVerification`,`tokenCode`)
-                    VALUES('{user_id}','{username}','{firstname}','{lastname}','{email}','{password}',FALSE,FALSE,'{token}')""")
+                    `users`(`user_id`,`username`,`firstname`,`lastname`,`email`,`password`,`registered`,`AccountVerification`,`tokenCode`, `notification`,`notification_numb`)
+                    VALUES('{user_id}','{username}','{firstname}','{lastname}','{email}','{password}',FALSE,FALSE,'{token}',0,0)""")
                     cnx.commit()
                     return True
                 else:
