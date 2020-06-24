@@ -315,7 +315,7 @@ def create_users(form):
             CREATE TABLE IF NOT EXISTS `liked`(
                 liked_id VARCHAR(100) ,
                 user_id VARCHAR(200) NOT NULL,
-                picture VARCHAR(100), 
+                username VARCHAR(100), 
                 PRIMARY KEY(liked_id),
                 FOREIGN KEY(user_id) REFERENCES `users`(user_id))
             """
@@ -331,7 +331,7 @@ def create_users(form):
             CREATE TABLE IF NOT EXISTS `likes`(
                 likes_id VARCHAR(100) ,
                 user_id VARCHAR(200) NOT NULL,
-                picture VARCHAR(100), 
+                username VARCHAR(100), 
                 PRIMARY KEY(likes_id),
                 FOREIGN KEY(user_id) REFERENCES `users`(user_id)
                 )
