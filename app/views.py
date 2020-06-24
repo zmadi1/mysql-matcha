@@ -157,13 +157,6 @@ ROOMS = ["lounge","news","games","coding"]
 
     # return render_template('admin/dash_board.html')
 
-@app.route('/forgotpass')
-def forgot_pass():
-
-    form = ForgotForm()
-
-    return render_template('public/forgotpass.html',form=form)
-
 
 @socketio.on('join')
 def join(data):
@@ -657,10 +650,37 @@ def confirm_email(token):
             return 'nothing was the same'
     return "success"
 
+@app.route('/forgotpass')
+def forgot_pass():
+
+    form = ForgotForm()
+
+    return render_template('public/forgotpass.html',form=form)
+
+@app.route('/reset_passwd', methods=['POST','GET'])
+def reset_passwd():
+    form = ForgotForm(request.form)
+
+    if request.method =='POST':
+        if form.validate():
+            resetP(form)
+            email = form.email.data
+            token = session.get("TOKEN")
+            # link  = url_for('change_pass',token=token, _external=True)
+        
+        # msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
+            msg = Message('Change password',sender='Matcha dating services', recipients=[email])
+            msg.body=f"Click here to change your password <a href='http://127.0.0.1:5000/changer' target='_blank'>Change Password</a>"
+            mail.send(msg)
+            return redirect(url_for('login'))
+
+# @app.route('/changer', methods=['POST','GET'])
+# def changer():
+
 
 @app.route('/login',methods=['POST','GET'])
 def login():
-
+    
     form=LoginForm()
     if request.method== 'POST':
         try:
@@ -817,7 +837,7 @@ def profile():
             cursor.execute("SELECT * FROM users")
             all_user = cursor.fetchall()
             
-        # for j in all_user:
+        # for j in all_user:git merge --abort
             # print(j[13])
         if profile_pic is None:
             profile = "user.png"
@@ -886,18 +906,27 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
+<<<<<<< HEAD
                                     # print(pic)
                                     # print('-----------------------')
                                     # print(picture)
+=======
+                                    print(pic[0])
+                                    print('-----------------------')
+                                    print(picture)
+>>>>>>> cf83b446d1c433a12dd7346c482371455b6627c3
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
+<<<<<<< HEAD
         
         
         # for i in posts:
             # print(i[0])
+=======
+>>>>>>> cf83b446d1c433a12dd7346c482371455b6627c3
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()
