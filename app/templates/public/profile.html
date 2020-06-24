@@ -1,12 +1,16 @@
-{% extends 'public/templates/public_templates.html'%}
+{% include 'public/templates/navbar.html'%}
+
+{% include 'public/templates/public_templates.html'%}
 
 {% block title %}Profile{% endblock %}
 
 {% block content %}
 
+{% if user %}
 
+{% block notify %}{% endblock %}
 
-
+{% endif %}
 <div class="content-section">
     <img class="rounded-circle account-img" src="{{ url_for('static',filename='img/'+profile)}}">
     <div>
@@ -35,9 +39,9 @@
                             <!-- <p><b>{{  posts.username }}</p></b> -->
                             <!-- <b><p>{{ posts.age }}</p></b> -->
                             <!-- <p>{{ users[0] }}</p> -->
-                            <p>
+                            <h1>
                                 {{users[loop.index - 1 ]}}
-                            </p>
+                            </h1>
 
                             <!-- <p>{{user}}</p> -->
                             <a href="" id="" class="link" ><img  id="profle" class="rounded-circle " src="{{ url_for('static',filename='img/'+user[0])}}" alt="" height="100" width="100" class="img-fluid img-thumbnail"></a>
@@ -78,7 +82,6 @@
 </div>
 
 {% endblock %}
-
 {% block script %}
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

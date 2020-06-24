@@ -15,6 +15,21 @@
    crossorigin=""/>
 
 
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+
+
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/userinfo/1.1.0/userinfo.min.js"></script>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="tagify.css" rel="stylesheet"/>
+    <!--custom css-->
+    <link rel="styleshee
 
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/userinfo/1.1.0/userinfo.min.js"></script>
 
@@ -28,55 +43,11 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="bootstrap4-glyphicons/css/bootstrap-glyphicons.css" rel="stylesheet">
-
+    
   </head>
   <body>
-    {% if user %}
+  <main role="main" class="container">
     
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="tab-content">
-     
-      </div>
-      <div id="noti" class="collapse navbar-collapse">
-        <h4 class="navbar-brand">{{username[0]}}</h4>
-        
-        <a href="{{ url_for('jinja')}}" class="notification">
-          <button type="button"  id="notification" class="btn btn-info">Notification 
-            <i class="fa fa-bell"></i>
-            
-          </button>
-        </a>
-        
-
-      </div>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      {% if user %}
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      
-       
-        <a class="navbar-brand" href="{{ url_for('profile')}}">HOME</a>
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="{{ url_for('account') }}">UPDATE-ACCOUNT</a>
-      </li>
-   </ul>
-  {% endif %}
-  <ul class="navbar-nav ml-auto">
-    <!-- <li class="nav-item">
-      <a class="nav-link" >LOGIN</a>
-    </li> -->
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">            Dropdown on Right</a>
-      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-        <a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a>
-      </div>
-    </li>
-  </ul>
-</nav>
-<main role="main" class="container">
- 
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
         {% for category, message in messages %}
@@ -89,29 +60,22 @@
   {% block content %}
   {% endblock %}
 </main>
-    {% else %}
-    {% block nav %}
-    {% endblock %}
+    
+
    
     <main role="main" class="container-sm">
       
       <div class="row-md-4">
         <div class="col-md-12">
         {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-              {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                  {{ message }}
-                </div>
-              {% endfor %}
-        {% endif %}  
+          
         {% endwith %}
         {% block main %}
         {% endblock %}
       </div>
 
     </main>
-    {% endif %}
+    
     {% block script %}{% endblock %}
 
     

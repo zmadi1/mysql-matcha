@@ -1,52 +1,17 @@
-{% extends 'public/templates/public_templates.html'%}
+{% include 'public/templates/navbar.html' %}
+
+{% extends 'public/templates/public_templates.html' %}
 
 {% block title %}sign up{% endblock %}
 
-{% block nav %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="tab-content">
-     
-   
-    </div>
-
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <a class="navbar-brand" href="{{ url_for('profile')}}">RETURN HOME</a>
-        <ul class="navbar-nav mr-auto">
-            
-    <li class="nav-item active">
-
-    </li>
- </ul>
-
-<ul class="navbar-nav ml-auto">
-  <!-- <li class="nav-item">
-    <a class="nav-link" >LOGIN</a>
-  </li> -->
-  <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">            Dropdown on Right</a>
-    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-      <a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a>
-      <a class="dropdown-item" href="#">Another action with a lot of text inside of an item</a>
-    </div>
-  </li>
-</ul>
-    </div>
-    
-  </nav>
-{% endblock %}
 {% block main %}
+
+{% block notify %}{% endblock %}
 
 <div class="content-section">
     <div class="media">
         <div class="media-body">
-           
-            <div class="media-body">
-                <h2 class="account-heading"> {{ existing_user }}</h2>
-               
-            </div>
+        
             <form method="POST" action="" enctype="multipart/form-data">
 
                 {{ form.hidden_tag() }}

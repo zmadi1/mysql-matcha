@@ -1,0 +1,47 @@
+{% block notify %}
+      
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="tab-content">
+        
+      </div>
+      <div id="noti" class="collapse navbar-collapse">
+          {% if  isIndex%}
+            <h4 class="navbar-brand">{{ existing_user[1] }}</h4>
+          {% else %}
+            <h4 class="navbar-brand">{{ existing_user }}</h4>
+          {% endif %}
+        <a href="{{ url_for('jinja')}}" class="notification">
+          <button type="button"  id="notification" class="btn btn-info">Notification 
+            <i class="fa fa-bell"></i>
+            
+          </button>
+        </a>
+        
+
+      </div>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        
+      
+        <a class="navbar-brand" href="{{ url_for('profile')}}">HOME</a>
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('account') }}">UPDATE-ACCOUNT</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+    <!-- <li class="nav-item">
+      <a class="nav-link" >LOGIN</a>
+      </li> -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">            Dropdown on Right</a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a>
+        </div>
+      </li>
+    </ul>
+    </nav>
+    {% endblock %}
+    
