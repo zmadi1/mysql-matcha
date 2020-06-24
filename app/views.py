@@ -886,28 +886,18 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-<<<<<<< HEAD
                                     # print(pic)
                                     # print('-----------------------')
                                     # print(picture)
-=======
-                                    print(pic[0])
-                                    print('-----------------------')
-                                    print(picture)
->>>>>>> 06cd5a6cd062311fcf2464363501c738d43ff18d
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
-<<<<<<< HEAD
         
         
         # for i in posts:
             # print(i[0])
-=======
-
->>>>>>> 06cd5a6cd062311fcf2464363501c738d43ff18d
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()
