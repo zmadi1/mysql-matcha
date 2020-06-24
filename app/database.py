@@ -234,6 +234,8 @@ def user_login(form):
         print(err)
         
     return
+def resetP(form):
+    email = form.email.data
 
 def create_users(form):
     

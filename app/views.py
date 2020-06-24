@@ -157,13 +157,6 @@ ROOMS = ["lounge","news","games","coding"]
 
     # return render_template('admin/dash_board.html')
 
-@app.route('/forgotpass')
-def forgot_pass():
-
-    form = ForgotForm()
-
-    return render_template('public/forgotpass.html',form=form)
-
 
 @socketio.on('join')
 def join(data):
@@ -623,7 +616,33 @@ def confirm_email(token):
             return 'nothing was the same'
     return "success"
 
+@app.route('/forgotpass')
+def forgot_pass():
 
+    form = ForgotForm()
+
+    return render_template('public/forgotpass.html',form=form)
+
+@app.route('/reset_passwd', methods=['POST','GET'])
+def reset_passwd():
+    form = ForgotForm(request.form)
+
+    if request.method =='POST':
+        if form.validate():
+            resetP(form)
+            email = form.email.data
+            token = session.get("TOKEN")
+            # link  = url_for('change_pass',token=token, _external=True)
+        
+        # msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
+            msg = Message('Change password',sender='Matcha dating services', recipients=[email])
+            msg.body=f"Click here to change your password <a href='http://127.0.0.1:5000/changer' target='_blank'>Change Password</a>"
+            mail.send(msg)
+            return redirect(url_for('login'))
+
+@app.route('/changer', methods=['POST','GET'])
+def changer():
+     
 @app.route('/login',methods=['POST','GET'])
 def login():
 
