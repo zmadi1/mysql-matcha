@@ -36,15 +36,18 @@ socketio = SocketIO(app)
 
 ROOMS = ["lounge","news","games","coding"]
 
-# print("What is happning")
 
 
-
-
-
-# @app.template_filter("clean_date")
-# def clean_date(dt):
-#     return dt.strftime("%d %b %Y")
+@app.route('/identity')
+def identity():
+    id=session.get("USER") 
+    # existing_blog_post = find_blog_post(id_)
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+            
+        cursor.execute(find_user_by_id(id))
+        existing_user = cursor.fetchone()
+    return()
 
 
 # app.config['IMAGE_UPLOADS'] = '~/Documents/app/app/static/img'
@@ -669,9 +672,9 @@ def login():
     if request.method== 'POST':
         try:
             if form.validate_on_submit():
-                print(f'is this what we reruned {user_login(form)}')
+                # print(f'is this what we reruned {user_login(form)}')
                 if user_login(form) == True:
-                    print('what is wrong kanti???????')
+                    # print('what is wrong kanti???????')
                     flash('You have logged in ','success')
                     return redirect(url_for('profile'))
                 elif user_login(form) == False:
@@ -890,18 +893,14 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-                                    # print(pic)
-                                    # print('-----------------------')
-                                    # print(picture)
+                                    print(pic[0])
+                                    print('-----------------------')
+                                    print(picture)
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
-        
-        
-        # for i in posts:
-            # print(i[0])
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()
@@ -928,7 +927,7 @@ def profile():
             # response = make_response(jsonify(req))
             # return response
 
-    return render_template('public/profile.html',existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username)
+    return render_template('public/profile.html',existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
     # else:
         # print("Userename not found in session")
         # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
@@ -960,7 +959,7 @@ def update():
             redirect(request.url)
   
     else:
-        return render_template('public/update_profile.html',form=form)
+        return render_template('public/update_profile.html',form=form, isUpdate=True)
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
