@@ -15,6 +15,7 @@
           {% else %}
         <a href="{{ url_for('jinja')}}" class="notification">
           <button type="button"  id="notification" class="btn btn-info">Notification 
+          <span   id="badge" class="badge badge-steel">{{notification}}</span>
             <i class="fa fa-bell"></i>
             
           </button>
@@ -46,5 +47,6 @@
       </li>
     </ul>
     </nav>
+
     {% endblock %}
     

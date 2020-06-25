@@ -55,10 +55,11 @@
                     </div>
                 </article>
                 <script>
-                    const username = `{{existing_user}}`
+                    const username = `{{existing_user[1]}}`
+                    console.log(username)
                 </script>
             </div>
-            <!-- <div class="col-md-4">
+            <div class="col-md-4">
                 <div class="content-section">
                   <h3>Hashtag bar</h3>
                     <p class='text-muted'>Trending.
@@ -74,7 +75,7 @@
                       </ul>
                     </p> 
                 </div>
-            </div> -->
+            </div> 
         </div>
 
     </div>   
@@ -125,7 +126,7 @@
                     'user':user,
                     'owner':value
                 }
-                console.log(data)
+            
                 socket.emit('like',data)
                 
                 socket.on(value,msg =>{

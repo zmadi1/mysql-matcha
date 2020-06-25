@@ -170,7 +170,7 @@ def join(data):
     # print(data)
     if data != {'user_name': {}, 'room': {}}:
         join_room(data['room'])
-    # print(data['room'])
+    print(data['room'])
     #When joining the room we receve this message automatically
     if data != {'user_name': {}, 'room': {}}:
         emit('my event',{'user_name':'chatbot','message':data['user_name'] + ' has joined the '+data['room'] + ' room.'},room=data['room'])
@@ -349,9 +349,12 @@ def handle_my_custom_event(data):
         # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
         cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{other_username}'")
         cnx.commit()
+        
+        
+        print(f"This is the room {other_user[0][1]}")
 
 
-    socketio.emit('Notification',data,room=other_username)
+    socketio.emit('Notification',data,room=other_user[0][1])
 
 
 
@@ -900,6 +903,9 @@ def profile():
                                     if picture != []:
                                         users.append(pic[1])
                                         posts.append(picture[0])
+            # with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                # cursor=cnx.cursor()
+                print(existing_user[-2])
         
         # interest_return = list(dict.fromkeys(interest_return))
 
@@ -927,7 +933,7 @@ def profile():
             # response = make_response(jsonify(req))
             # return response
 
-    return render_template('public/profile.html',existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
     # else:
         # print("Userename not found in session")
         # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
