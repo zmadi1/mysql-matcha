@@ -20,8 +20,7 @@ from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO,send,emit,join_room, leave_room
 import time
 from time import localtime,strftime
-# from flask_socketio import SocketIO
-# from flask_mail import Mail,Message
+
 from itsdangerous import SignatureExpired, URLSafeTimedSerializer
 
 # bcrypt = Bcrypt(app)
@@ -49,6 +48,16 @@ def identity():
         existing_user = cursor.fetchone()
     return()
 
+# Check if user logged in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'USER' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, Please login', 'danger')
+            return redirect(url_for('login'))
+    return wrap
 
 # app.config['IMAGE_UPLOADS'] = '~/Documents/app/app/static/img'
 # @app.route('/admin')
@@ -476,10 +485,6 @@ def jinja():
     langs=langs,friends=friends,colours=colours,gitremote=gitremote,repeat=repeat
     )
 
-@app.route('/about')
-def admin_about():
-    return "About"
-
 @app.route('/sign-up',methods=['GET','POST'])
 def sign_up():
 
@@ -700,7 +705,7 @@ def reset_passwd():
 # def changer():
 
 
-@app.route('/login',methods=['POST','GET'])
+@app.route('/',methods=['POST','GET'])
 def login():
     
     form=LoginForm()
@@ -750,6 +755,7 @@ def allowed_image_filesize(filesize):
 
 
 @app.route('/upload-image',methods=['GET','POST'])
+@is_logged_in
 def upload_image():
 
     
@@ -834,6 +840,7 @@ def upload_image():
 
 
 @app.route('/profile',methods=['GET','POST'])
+@is_logged_in
 def profile():
 
     # print("where am i printing this?")
@@ -970,6 +977,7 @@ def profile():
 
 
 @app.route("/logout")
+@is_logged_in
 def logout():
     session.pop('user',None)
     session.clear()
@@ -979,8 +987,8 @@ def logout():
 
 
 @app.route('/update',methods=['GET','POST'])
+@is_logged_in
 def update():
-    
     form = UpdateAccountForm()
        
     
@@ -1104,6 +1112,7 @@ def save_picture(form_picture):
 
 
 @app.route("/account",methods=['POST','GET'])
+@is_logged_in
 def account():
     form=UploadsForm()
 
