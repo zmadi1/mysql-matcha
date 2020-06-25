@@ -232,37 +232,98 @@ def open_profile(data):
 
 
 
-@app.route('/message',methods=['GET','POST'])
+@app.route('/message-send',methods=['GET','POST'])
 def message():
+
     id = session.get('USER')
 
    
-    id=session.get("USER")
+
+
+
 
     form = MessageForm()
-    existing_user = find_id(id)
-    existing_blog_post = find_blog_post(id)
-    user = existing_user['username']
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+
+        cursor.execute(f"SELECT `username` FROM `likes` WHERE `user_id`='{id}'")
+        existing_user = cursor.fetchall()
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT `username` FROM `users` WHERE `user_id`='{id}'")
+        user = cursor.fetchall()
+
+        # print(f"{user[0][0]} is the current user")
+    
+    # print(f"{existing_user[0][0]} this is what the current user is holding")
+
+    if existing_user != []:
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+
+            cursor.execute(f"SELECT `user_id` FROM `users` WHERE `username`='{existing_user[0][0]}'")
+            other_user = cursor.fetchall()
+    
+    # print(other_user) 
+        if other_user !=[]:
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+
+                cursor.execute(f"SELECT `username` FROM `likes` WHERE `user_id`='{other_user[0][0]}'")
+                other_user_likes = cursor.fetchall()
+
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+
+                cursor.execute(f"SELECT `username` FROM `users` WHERE `user_id`='{other_user[0][0]}'")
+                other_user_users = cursor.fetchall()
+    
+    # print(f"'{other_user_likes[0][0]}' this is what the other person is holding")
+    # print(other_user_users[0][0])
+    # print(existing_user[0][0])
+            if user and other_user_users or existing_user and other_user_users !=[]:
+                if user[0][0]== other_user_likes[0][0]:
+                    if existing_user[0][0] == other_user_users[0][0]:
+                        print("You have both liked each other")
+
+    # print("||||||||||||||||||||||||||")
+    # print(other_user_users[0][0])
+    # print("|||||||||||||||||||||||||||")
+    # print()
+
+        # print("they can chat")
+    
+    # print("-----------------")
+    # print(existing_user[0][0])
+    # print(other_user_likes[0][0])
+    # print("-----------------")
+    # print(other_user_likes[0][2])
+    # print(other_user_likes[0][2])
+
+    # existing_blog_post = find_blog_post(i
+    # user = existing_user['username']
 
     rooms = []
 
-    for i in existing_user['liked']:
-        if i['id'] == 'like':
-            other_user = find_user(i['owner'])
-            for k in other_user['liked']:
-                if k['id'] == 'like':
-                    if k['owner'] == i['user']:
-                        # print(k['owner'])
-                        # print('--------------------------------')
-                        # print(i['user'])
-                        rooms.append(i['owner'])
+    # for i in existing_user['liked']:
+    #     if i['id'] == 'like':
+    #         other_user = find_user(i['owner'])
+    #         for k in other_user['liked']:
+    #             if k['id'] == 'like':
+    #                 if existing_user[0][2] == i['user']:
+    #                     # print(k['owner'])
+    #                     # print('--------------------------------')
+    #                     # print(i['user'])
+    #                     rooms.append(i['owner'])
 
-    rooms = list(dict.fromkeys(rooms))
+    # rooms = list(dict.fromkeys(rooms))
     
-    msg = collection()
+    # msg = collection()
 
 
-    return render_template('public/chat.html',rooms=rooms,msg=msg,form=form,existing_blog_post=existing_blog_post,existing_user=existing_user,id=id,user=user)
+    return render_template('public/chat.html')
 
 def collection():
     user = session.get('USER')
