@@ -293,7 +293,7 @@ def handle_my_custom_event(data):
     username = data['owner']
     other_username = data['user']
 
-    print(f"This belong to {other_username}")
+    # print(f"This belong to {other_username}")
 
     # getting the current user
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
@@ -301,9 +301,6 @@ def handle_my_custom_event(data):
         cursor.execute(f"SELECT * FROM `users` WHERE `username`='{username}'")
         
         user = cursor.fetchall()
-    print('-------------------------------------------------------')
-    print(user[0][1])
-    print('--------------------------------------------------------')
 
 
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
@@ -312,80 +309,48 @@ def handle_my_custom_event(data):
         
         other_user = cursor.fetchall()
 
-    print(f"This is the other user {other_user[0][1]}")
-    # | likes_id | varchar(100) | NO   | PRI | NULL    |       |
-# | user_id  | varchar(200) | NO   | MUL | NULL    |       |
-# | picture  | varchar(100)
+
 
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{user[0][1]}')")
+        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}')")
         
         cnx.commit()
 
         
-    # prev = find_user(username)
-    # prev_liked = prev['likes']
+
     
     #Recording that i have liked someone
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{other_user[0][1]}')")
+        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}')")
         
         cnx.commit()
-    # push_user_likes(username,data)
+        
 
-    #Recording that someone has liked me
-    # push_user_liked_you(post_id,data)
 
-    #getting the current user to check
-    #whether someone has liked their profile
-    
     
    
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
-        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{user[0][0]}'")
+        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
         
         old_user=cursor.fetchall()
         cnx.commit()
-    
-    print('-------=-=======0-=-=-=-==-=-=')
-    print(user[0][0])
-    print('********************************')  
-    print(old_user)
-        # cnx.commit()
-    # old_user = find_user(post_id)
-
-    #checking whether someone has liked my profile
-    # print(old_user)
-    # if old_user != None:
-        # old_noti_user = len(old_user['liked'])
-
-    #updating notification that someone has liked my profile
+        
+    print(old_user[0][0])
+    print(other_username)
+    # updating notification that someone has liked my profile
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
         # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
-        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE `username`='{user[0][1]}'")
-    # if old_user != None:
-        # notification_update( old_user['username'],old_noti_user)
+        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{other_username}'")
+        cnx.commit()
 
-    # current = find_user(username)
-
-    # current_liked = current['liked']
-
-    # notification = len(current_liked)
-
-    # number = notification_update( current['username'],notification)
-    # noti = find_user(username)
-   
-    # number = noti['notification']
 
     socketio.emit('Notification',data,room=other_username)
 
-# @socketio.on('profile')
-# def profile(data):
-#     print(data)
+
 
 @app.template_filter('low')  
 def low(t):
