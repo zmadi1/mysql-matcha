@@ -1,13 +1,14 @@
-{% include 'public/templates/public_templates.html '%}
+{% include 'public/templates/navbar.html' %}
 
-{% include 'public/templates/navbar.html '%}
-
+{% extends 'public/templates/public_templates.html'%}
 
 {% block title %}Profile{% endblock %}
 
 {% block main %}
+{% block notify %}{% endblock %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" crossorigin="anonymous">
+
 <div class="container">
   
 </div>

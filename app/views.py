@@ -928,27 +928,14 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-<<<<<<< HEAD
                                     print(pic[0])
                                     print('-----------------------')
                                     print(picture)
-=======
-                                    # print(pic)
-                                    # print('-----------------------')
-                                    # print(picture)
->>>>>>> ad6db218722f734aed639efcdad9710bdf045b6e
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
                                         posts.append(picture[0])
         
-<<<<<<< HEAD
-=======
-        
-        
-        # for i in posts:
-            # print(i[0])
->>>>>>> ad6db218722f734aed639efcdad9710bdf045b6e
         # interest_return = list(dict.fromkeys(interest_return))
 
         # pagination =users_pagination()
@@ -1007,7 +994,7 @@ def update():
             redirect(request.url)
   
     else:
-        return render_template('public/update_profile.html',form=form)
+        return render_template('public/update_profile.html',form=form, isUpdate=True)
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
