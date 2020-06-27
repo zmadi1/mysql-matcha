@@ -254,11 +254,13 @@ def message():
         cursor=cnx.cursor()
         cursor.execute(f"SELECT `username` FROM `users` WHERE `user_id`='{id}'")
         user = cursor.fetchall()
+    
+    print(f"{user[0][0]} hello--------------------------")
 
         # print(f"{user[0][0]} is the current user")
     
     # print(f"{existing_user[0][0]} this is what the current user is holding")
-
+    rooms = []
     if existing_user != []:
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
@@ -283,10 +285,16 @@ def message():
     # print(f"'{other_user_likes[0][0]}' this is what the other person is holding")
     # print(other_user_users[0][0])
     # print(existing_user[0][0])
-            if user and other_user_users or existing_user and other_user_users !=[]:
-                if user[0][0]== other_user_likes[0][0]:
-                    if existing_user[0][0] == other_user_users[0][0]:
-                        print("You have both liked each other")
+            print(other_user_likes)
+            if user and other_user_likes !=[]:
+                if user[0][0]==other_user_likes[0][0]:
+                    if existing_user and other_user_users !=[]:
+                        if existing_user[0][0] == other_user_users[0][0]:
+                            rooms.append(other_user_users[0][0])
+                            print("You have both liked each other")
+        
+
+    print(rooms)
 
     # print("||||||||||||||||||||||||||")
     # print(other_user_users[0][0])
@@ -305,7 +313,7 @@ def message():
     # existing_blog_post = find_blog_post(i
     # user = existing_user['username']
 
-    rooms = []
+    
 
     # for i in existing_user['liked']:
     #     if i['id'] == 'like':
@@ -323,7 +331,7 @@ def message():
     # msg = collection()
 
 
-    return render_template('public/chat.html')
+    return render_template('public/chat.html',rooms=rooms,user=user[0][0])
 
 def collection():
     user = session.get('USER')
@@ -349,11 +357,11 @@ def handle_event(data):
     id = session.get("USER")
     if data is not None:
         messages = data
-        # print(data['room'])
-        # print(data['room'])
+        print(data['room'])
+        print(messages)
         if messages != {}:
-            push_user_messages(id,messages)
-            push_owner_messages(data['room'],messages)
+            # push_user_messages(id,messages)
+            # push_owner_messages(data['room'],messages)
             emit('my event',{'user_name':data['user_name'],'message':data['message'],'time_stamp':strftime('%b-%d %I:%M%p',localtime())},room=data['room'],broadcast=False)
     # print(data)
 
@@ -886,10 +894,12 @@ def profile():
             username = cursor.fetchone()
             
             cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{id}'")
-            profile_pic = cursor.fetchone()
+            profile_pic = cursor.fetchall()
             
             cnx.close()
-        
+
+
+        print(profile_pic)        
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()    
             cursor.execute("SELECT * FROM users")
@@ -897,10 +907,10 @@ def profile():
             
         # for j in all_user:git merge --abort
             # print(j[13])
-        if profile_pic is None:
+        if profile_pic ==[]:
             profile = "user.png"
         else:
-            profile = profile_pic[0]
+            profile = profile_pic[0][0]
         # print(profile_pic[0])
         # print(user_id[0])
 

@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         let user_input = $('input.message').val()
+        // console.log(user)
+        // console.log(user_input)
 
         //Sending messages to the server
         socket.emit('my event', {
@@ -42,13 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
     //Display incoming messages
     socket.on('my event', msg => {
 
-        const span_timestamp = document.createElement('span')
-        span_timestamp.innerHTML = msg.time_stamp
         console.log(msg)
-        console.log(Date())
+        const span_timestamp = document.createElement('span')
+        // span_timestamp.innerHTML = msg.time_stamp
+        // console.log(Date())
             // $('div.message_holder').append(span_timestamp.innerHTML)
         $('div.message_holder').append(`<div><b style="color: #000">${msg['user_name']}</b> ${msg.message}</div>`)
-        document.querySelector('.message_holder').scrollTop = document.querySelector('.message_holder').scrollHeight;
+        // document.querySelector('.message_holder').scrollTop = document.querySelector('.message_holder').scrollHeight;
     })
 
 

@@ -149,7 +149,7 @@ def user_update(form):
             print(user)
             
     
-            # print('*((((((((((((((((((((((*++++++++++++++++++++++****************************')
+     
             if user[0] != None and user[1] != None:
                 return True
             else:
