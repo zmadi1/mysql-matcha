@@ -12,7 +12,9 @@
 <div class="container">
   
 </div>
-<div class="form-group ">
+<div class="content-section">
+    <div class="media">
+        <div class="media-body">
   
   <form method="POST" action="" enctype="multipart/form-data">
     
@@ -76,7 +78,15 @@
           {{ form.sexualPreference(class="")}}
         </div>
 
-        
+        <div class="form-group">
+          {{ form.picture.label() }}
+          {{ form.picture(class="form-control-file") }}
+          {% if form.picture.errors %}
+              {% for error in form.picture.errors %}
+                <span class="text-danger">{{ error }}</span><br>
+              {% endfor %}
+          {% endif %}
+        </div>
         
       
         
@@ -88,6 +98,8 @@
         
       </fieldset>
       </form>  
+</div>
+</div>
 </div>
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js" crossorigin="anonymous"></script>

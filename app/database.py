@@ -376,3 +376,149 @@ def create_users(form):
             pass
             # flash('The username or the email have been taken,please try a different one','danger')
         cursor.close()
+
+def upd_username(form):
+    id = session["USER"] 
+    username = form.username.data
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        
+        cursor.execute(find_user_by_id(id))
+        existing_user = cursor.fetchone()
+
+    with sqlmgr(user='root',pwd='',db='Matcha') as cnx:
+        cursor=cnx.cursor()        
+            
+        cursor.execute(count_user(username))
+        user_number = cursor.fetchone()
+
+        if user_number[0] != 1:
+                    
+            print(username)
+            print(existing_user)
+            cursor.execute(f"UPDATE users SET `username` = '{username}' WHERE `username` = '{existing_user[0]}'")
+            cnx.commit()
+            flash('Username has been updated','success')
+            return True
+    
+        else:
+            flash('The Username has already been taken,please try a different one','danger')
+        
+        cursor.close()
+
+def upd_email(form):
+
+    id = session["USER"] 
+    email = form.email.data
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        
+        cursor.execute(find_user_by_id(id))
+        existing_user = cursor.fetchone()
+
+    with sqlmgr(user='root',pwd='',db='Matcha') as cnx:
+        cursor=cnx.cursor()
+            
+        cursor.execute(count_email(email))
+        email_number = cursor.fetchone()
+            
+        if email_number[0] != 1:
+            cursor.execute(f"UPDATE users SET `email` = '{email}' WHERE `username` = '{existing_user[0]}'")
+            cnx.commit()
+            flash('Email has successfuly been updated','success')
+            return True
+        else:
+            flash('The email has already been taken,please try a different one','danger')
+
+        cursor.close()
+
+def upd_age(form):
+    id = session["USER"]
+    age = form.age.data 
+    
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+            
+        cursor.execute(find_user_by_id(id))
+        username = cursor.fetchone()    
+        
+        if username[0]:
+            cursor.execute(f"UPDATE users SET `age` = '{age}' WHERE `username`='{username[0]}'")
+            cnx.commit()
+        else:
+            cursor.close()
+    return True
+
+def upd_interest(form):
+    id = session["USER"]
+    interest = form.interest.data 
+    
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+            
+        cursor.execute(find_user_by_id(id))
+        username = cursor.fetchone()    
+        
+        if username[0]:
+            cursor.execute(f"UPDATE users SET `Interest` = '{interest}' WHERE `username`='{username[0]}'")
+            cnx.commit()
+        else:
+            cursor.close()
+    return True
+
+def upd_bio(form):
+    id = session["USER"]
+    bio = form.bio.data 
+    
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+            
+        cursor.execute(find_user_by_id(id))
+        username = cursor.fetchone()    
+        
+        if username[0]:
+            cursor.execute(f"UPDATE users SET `bio` = '{bio}' WHERE `username`='{username[0]}'")
+            cnx.commit()
+        else:
+            cursor.close()
+    return True
+
+def upd_gender(form):
+    id = session["USER"]
+    gender = form.gender.data 
+    
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+            
+        cursor.execute(find_user_by_id(id))
+        username = cursor.fetchone()    
+        
+        if username[0]:
+            cursor.execute(f"UPDATE users SET `gender` = '{gender}' WHERE `username`='{username[0]}'")
+            cnx.commit()
+        else:
+            cursor.close()
+    return True
+
+def upd_sexual(form):
+    id = session["USER"]
+    sexual = form.sexualPreference.data 
+    
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+            
+        cursor.execute(find_user_by_id(id))
+        username = cursor.fetchone()    
+        
+        if username[0]:
+            cursor.execute(f"UPDATE users SET `sexualPreference` = '{sexual}' WHERE `username`='{username[0]}'")
+            cnx.commit()
+        else:
+            cursor.close()
+    return True
+# def get_goodies(form):
+#     form.username.data = existing_user[0]
+#     form.email.data =email_and_username_by_id[0]
+#     return True

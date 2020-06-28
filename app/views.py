@@ -965,10 +965,9 @@ def update():
     
     if request.method == 'POST':
         if user_update(form) == True:
-            print(user_update(form))
-            print('Here we are')
-            
-            return redirect(url_for('profile'))
+            if form.picture.data:
+                picture_file = save_picture(form.picture.data)
+                return redirect(url_for('profile'))
         else:
             redirect(request.url)
   
@@ -1094,34 +1093,26 @@ def account():
         
         cursor.execute(find_user_by_id(id))
         existing_user = cursor.fetchone()
-        
-        cursor.execute(find_email_and_username_by_id(id))
-        email_and_username_by_id = cursor.fetchone()
-        
-    
-    print(existing_user)
-    print(email_and_username_by_id)
-
 
     if request.method == 'POST':
-        if form.validate_on_submit():
-            if form.username.data != existing_user[0]:
-                if find_username(form) == None:
-                    username_update(form,existing_user)
-                    flash('username has been updated','success')
-                else:
-                    flash('Sorry the username has already been taken')
-            if form.email.data != email_and_username_by_id[0]:
-                if find_email(form) == None:
-                    email_update(form,existing_user)
-                    flash('email has been updated','success')
-                else:
-                    flash('Sorry the email has already been taken')
-            if form.picture.data:
-                picture_file = save_picture(form.picture.data)
-    elif request.method =='GET':
-        form.username.data = existing_user[0]
-        form.email.data =email_and_username_by_id[0]
+
+        if form.username.data:
+            upd_username(form)
+        if form.email.data:
+            upd_email(form)
+        if form.age.data:
+            upd_age(form)
+        if form.interest.data:
+            upd_interest(form)
+        if form.bio.data:
+            upd_bio(form)
+        if form.gender.data:
+            upd_gender(form)
+        if form.sexualPreference.data:
+            upd_sexual(form)
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+
     return render_template('public/account.html',form=form,existing_user=existing_user[0])
 
 
