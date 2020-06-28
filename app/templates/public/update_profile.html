@@ -32,7 +32,7 @@
         {% else %}
         {{ form.age(class="form-control form-control-lg")}}
         {% endif %}
-
+        <br>
        <div></div>
 
         {{ form.interest.label(class='form-control-label')}}
@@ -46,7 +46,7 @@
         {% else %}
         {{ form.interest(class="form-control form-control-lg", id="tag", data_role="tagsinput", type="text")}}
         {% endif %}
-
+        <br>
         {{ form.bio.label(class='form-control-label')}}
         {%if form.bio.errors %}
         <div class="invalid-feedback">
