@@ -34,16 +34,14 @@
                 <article class="media content-section">
                     <div class="media">
                         <div class="media-body" style="overflow-x:auto;">  
-                            <!-- <p>{{users[1]}}</p> -->
+                           
                             {% for user in  posts %}
-                            <!-- <p><b>{{  posts.username }}</p></b> -->
-                            <!-- <b><p>{{ posts.age }}</p></b> -->
-                            <!-- <p>{{ users[0] }}</p> -->
+                          
                             <h5>
                                 {{users[loop.index - 1 ]}}
                             </h5>
 
-                            <!-- <p>{{user}}</p> -->
+                            
                             <a href="" id="" class="link" ><img  id="profle" class="rounded-circle " src="{{ url_for('static',filename='img/'+user[0])}}" alt="" height="100" width="100" class="img-fluid img-thumbnail"></a>
                             <button name="{{users[loop.index - 1]}}" value="{{existing_user[1]}}" id="like"  type="button" class="btn btn-success"><i class="fa fa-heart"></i></button>
                             <button name="{{ users[loop.index - 1] }}" value="{{existing_user[1]}}" id="dislike" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>                            
@@ -63,7 +61,7 @@
                 <div class="content-section">
                   <h3>Hashtag bar</h3>
                     <p class='text-muted'>Trending.
-                      <ul class="list-group">('/
+                      <ul class="list-group">
                         <p>
                             <div id="enter" class="tags-input" data-name="tags-input">
                                

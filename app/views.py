@@ -232,37 +232,200 @@ def open_profile(data):
 
 
 
-@app.route('/message',methods=['GET','POST'])
+@app.route('/message-send',methods=['GET','POST'])
 def message():
+
     id = session.get('USER')
 
    
-    id=session.get("USER")
+
+
+
 
     form = MessageForm()
-    existing_user = find_id(id)
-    existing_blog_post = find_blog_post(id)
-    user = existing_user['username']
 
-    rooms = []
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
 
-    for i in existing_user['liked']:
-        if i['id'] == 'like':
-            other_user = find_user(i['owner'])
-            for k in other_user['liked']:
-                if k['id'] == 'like':
-                    if k['owner'] == i['user']:
-                        # print(k['owner'])
-                        # print('--------------------------------')
-                        # print(i['user'])
-                        rooms.append(i['owner'])
+        cursor.execute(f"SELECT `username` FROM `likes` WHERE `user_id`='{id}'")
+        existing_user = cursor.fetchall()
+    # print(existing_user)
 
-    rooms = list(dict.fromkeys(rooms))
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT `username` FROM `users` WHERE `user_id`='{id}'")
+        user = cursor.fetchall()
     
-    msg = collection()
+    # print(f"{user[0][0]} hello--------------------------")
+
+        # print(f"{user[0][0]} is the current user")
+    
+    # print(f"{existing_user[0][0]} this is what the current user is holding")
 
 
-    return render_template('public/chat.html',rooms=rooms,msg=msg,form=form,existing_blog_post=existing_blog_post,existing_user=existing_user,id=id,user=user)
+    
+    rooms = []
+    other_user = []
+    print("hello world")
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()    
+        cursor.execute(f"SELECT `username` FROM `likes` WHERE `user_id`='{id}'")
+        likes = cursor.fetchall()
+        # other_user.append(k[0])
+
+    print(f"{likes} these are the people i liked")
+
+
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()    
+        cursor.execute(f"SELECT `username` FROM `liked` WHERE `user_id`='{id}'")
+        liked = cursor.fetchall()
+        # other_user.append(k[0])
+
+    print(f"{liked} these are the people who liked me")
+
+
+    for i in likes:
+        print(f"just checking likes ==={i[0]}")
+        for k in liked:
+            if i == k:
+                rooms.append(i[0])
+                print(f"just checking liked+++++++{k[0]}")
+    
+    # if existing_user != []:
+        # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        #     cursor=cnx.cursor()
+            
+        #     cursor.execute(f"SELECT `user_id` FROM `users` WHERE `username`='{existing_user[0][0]}'")
+        #     other_user = cursor.fetchall()
+
+        # for i in existing_user:
+        #     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        #         cursor=cnx.cursor()    
+        #         cursor.execute(f"SELECT `user_id` FROM `users` WHERE `username`='{i[0]}'")
+        #         k = cursor.fetchone()
+
+        #         other_user.append(k[0])
+
+        #     # print(i[0])
+        # print(f"{other_user} these are other users-----------------------------------------------------------------")
+
+       
+
+        # for i in other_user:
+            # print(i)
+        # print(f"{other_user}++++++++++++++++++ we're checking") 
+        # if other_user !=[]:
+            # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            #     cursor=cnx.cursor()
+
+            #     cursor.execute(f"SELECT `username` FROM `likes` WHERE `user_id`='{other_user[0][0]}'")
+            #     other_user_likes = cursor.fetchall()
+
+            # other_user_likes= []
+            # for i in other_user:
+            #     print(i)
+            # print(f"{other_user}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            # for i in other_user:
+                # print(i)
+                # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                    # cursor=cnx.cursor()    
+                    # cursor.execute(f"SELECT `username` FROM `likes` WHERE `user_id`='{i}'")
+                    # k = cursor.fetchall()
+                # print(f"{k}++++++++++++++++++++++++++++++++=============================")
+    
+            # other_user_likes.append(k)
+            # print(f"{other_user_likes} &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+
+            # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            #     cursor=cnx.cursor()
+
+            #     cursor.execute(f"SELECT `username` FROM `users` WHERE `user_id`='{other_user[0][0]}'")
+            #     other_user_users = cursor.fetchall()
+            # other_user_users=[]
+            # for i in other_user:
+            #     print(i)
+            #     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            #         cursor=cnx.cursor()    
+            #         cursor.execute(f"SELECT `username` FROM `users` WHERE `user_id`='{i}'")
+            #         k = cursor.fetchone()
+
+            #         other_user_users.append(k[0])
+
+            # print(f"{other_user_users}************************************************************")
+    
+    # print(f"'{other_user_likes[0][0]}' this is what the other person is holding")
+    # print(other_user_users[0][0])
+   
+            # print(other_user_likes)
+            # print(f"This is the current user {user}")
+            # print(existing_user)
+            # print(other_user_likes)
+            # print(user)
+            # print(other_user_likes )
+
+            # for k in existing_user:
+            #     # print(k[0])
+
+            #     for i in other_user_likes:
+            #         for j in i:
+
+            #             # print(j[0])
+            #             if user[0][0] == j[0]:
+            #                 rooms.append(k[0])
+                        # print("We did make it here")
+                 
+                        # print(i[0])
+            # if user and other_user_likes ('mapula',), ('Tshepo',)]!=[]:
+                # print(other_user)
+                # for i in other_user_likes:
+                #     # print(f"{i[0]} this are the users")
+                #     if user[0][0]==i:
+                #         if existing_user and other_user_users !=[]:
+                #             if existing_user[0][0] == other_user_users[0][0]:
+                #                 rooms.append(other_user_users[0][0])
+                #                 print("You have both liked each other")
+        
+
+    # print(rooms)
+
+    # print("||||||||||||||||||||||||||")
+    # print(other_user_users[0][0])
+    # print("|||||||||||||||||||||||||||")
+    # print()
+
+        # print("they can chat")
+    
+    # print("-----------------")
+    # print(existing_user[0][0])
+    # print(other_user_likes[0][0])
+    # print("-----------------")
+    # print(other_user_likes[0][2])
+    # print(other_user_likes[0][2])
+
+    # existing_blog_post = find_blog_post(i
+    # user = existing_user['username']
+
+    
+
+    # for i in existing_user['liked']:
+    #     if i['id'] == 'like':
+    #         other_user = find_user(i['owner'])
+    #         for k in other_user['liked']:
+    #             if k['id'] == 'like':
+    #                 if existing_user[0][2] == i['user']:
+    #                     # print(k['owner'])
+    #                     # print('--------------------------------')
+    #                     # print(i['user'])
+    #                     rooms.append(i['owner'])
+
+    # rooms = list(dict.fromkeys(rooms))
+    
+    # msg = collection()
+
+
+    return render_template('public/chat.html',rooms=rooms,user=user[0][0])
 
 def collection():
     user = session.get('USER')
@@ -288,11 +451,11 @@ def handle_event(data):
     id = session.get("USER")
     if data is not None:
         messages = data
-        # print(data['room'])
-        # print(data['room'])
+        print(data['room'])
+        print(messages)
         if messages != {}:
-            push_user_messages(id,messages)
-            push_owner_messages(data['room'],messages)
+            # push_user_messages(id,messages)
+            # push_owner_messages(data['room'],messages)
             emit('my event',{'user_name':data['user_name'],'message':data['message'],'time_stamp':strftime('%b-%d %I:%M%p',localtime())},room=data['room'],broadcast=False)
     # print(data)
 
@@ -825,10 +988,12 @@ def profile():
             username = cursor.fetchone()
             
             cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{id}'")
-            profile_pic = cursor.fetchone()
+            profile_pic = cursor.fetchall()
             
             cnx.close()
-        
+
+
+        print(profile_pic)        
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()    
             cursor.execute("SELECT * FROM users")
@@ -836,10 +1001,10 @@ def profile():
             
         # for j in all_user:git merge --abort
             # print(j[13])
-        if profile_pic is None:
+        if profile_pic ==[]:
             profile = "user.png"
         else:
-            profile = profile_pic[0]
+            profile = profile_pic[0][0]
         # print(profile_pic[0])
         # print(user_id[0])
 
@@ -1086,7 +1251,15 @@ def save_picture(form_picture):
 def account():
     form=UploadsForm()
 
-    id=session.get("USER") 
+    id=session.get("USER")
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        
+        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+        existing = cursor.fetchone()
+    
+    notification = existing[-2]
     # existing_blog_post = find_blog_post(id_)
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         cursor=cnx.cursor()
