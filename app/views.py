@@ -1252,7 +1252,15 @@ def save_picture(form_picture):
 def account():
     form=UploadsForm()
 
-    id=session.get("USER") 
+    id=session.get("USER")
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        
+        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+        existing = cursor.fetchone()
+    
+    notification = existing[-2]
     # existing_blog_post = find_blog_post(id_)
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         cursor=cnx.cursor()
@@ -1287,7 +1295,7 @@ def account():
     elif request.method =='GET':
         form.username.data = existing_user[0]
         form.email.data =email_and_username_by_id[0]
-    return render_template('public/account.html',form=form,existing_user=existing_user[0])
+    return render_template('public/account.html',notification=notification,form=form,existing_user=existing_user[0])
 
 
 @app.route("/post/new",methods=['GET','POST'])
