@@ -17,15 +17,15 @@
                     <tr valign="top">
                       <div class="container">
                         
-                        <td><img class="rounded-circle  " src="{{ url_for('static',filename='img/'+post.profile_pic)}}" height="100" width="100" alt="" class="img-fluid"></td>
+                        
                         
                         
                         <td>
-                          <h6><b>User:</b> {{ post.firstname }}</h6>
-                          {% if post.bio %}<p><b>Bio:</b>{{ post.bio }}</p>{% endif %}
-                          <h6><b>Age:</b>{{ post.age }}</h6>
-                          <h6><b>Gender:</b>{{ post.gender }}</h6>
-                          <h6><b>SexualPreference:</b>{{ post.sexualPreference }}</h6>
+                          <h6><b>User:</b> {{ post[1] }}</h6>
+                          <p></p><b>Bio:</b>{{ post[7] }}</p>
+                          <h6><b>Age:</b>{{ post[6] }}</h6>
+                          <h6><b>Gender:</b>{{ post[10] }}</h6>
+                          <h6><b>SexualPreference:</b>{{ post[11] }}</h6>
                           <!-- <h6><b>Age:</b>{{ post.age }}</h6> -->
                         </td>
                                                 

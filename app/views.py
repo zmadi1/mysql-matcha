@@ -293,6 +293,7 @@ def message():
                 rooms.append(i[0])
                 print(f"just checking liked+++++++{k[0]}")
     
+    rooms = list(dict.fromkeys(rooms))
     # if existing_user != []:
         # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         #     cursor=cnx.cursor()
@@ -449,11 +450,48 @@ def collection():
 @socketio.on('my event')
 def handle_event(data):
     id = session.get("USER")
+
+    message_id =secrets.token_urlsafe()
     if data is not None:
         messages = data
         print(data['room'])
         print(messages)
         if messages != {}:
+
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+
+
+                #   CREATE TABLE IF NOT EXISTS `pictures`(
+                # pictures_id VARCHAR(100) ,
+                # user_id VARCHAR(200) NOT NULL,
+                # picture VARCHAR(100), 
+                # PRIMARY KEY(pictures_id),
+                # FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+                # )
+
+
+                cursor.execute(f"""CREATE TABLE IF NOT EXISTS `messages`
+                (
+                    message_id VARCHAR(200) NOT NULL,
+                    user_id VARCHAR(200) NOT NULL,
+                    message TEXT NOT NULL,
+                    username VARCHAR(100) NOT NULL,
+                    epoch VARCHAR(250) NOT NULL,  
+                    PRIMARY KEY(message_id),
+                    FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+                )""")
+                cnx.commit()
+            
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+                cursor.execute(f"""
+                INSERT INTO  `messages`(`message_id`,`user_id`,`message`,`username`,`epoch`)
+                VALUES('{message_id}','{id}','{messages['message']}','{messages['room']}','{messages['time']}')
+                """)
+                cnx.commit()
+
+
             # push_user_messages(id,messages)
             # push_owner_messages(data['room'],messages)
             emit('my event',{'user_name':data['user_name'],'message':data['message'],'time_stamp':strftime('%b-%d %I:%M%p',localtime())},room=data['room'],broadcast=False)
@@ -526,7 +564,7 @@ def handle_my_custom_event(data):
         print(f"This is the room {other_user[0][1]}")
 
 
-    socketio.emit('Notification',data,room=other_user[0][1])
+    socketio.emit('notification',data,room=other_user[0][1])
 
 
 
@@ -1310,24 +1348,30 @@ def new_post():
 
 @app.route("/post/<string:post_id>")
 def post(post_id):
-    user =session.get("USER")
+    user =post_id
     # id = str(post_id)
     # print(id)
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+    
+        cursor.execute(f"SELECT * FROM `users` WHERE `username`= '{user}'")
+        check_token = cursor.fetchone()
 
-    post = find_user(post_id)
 
-    id = post['_id']
+    print(check_token)
 
-    author = find_blog_post(id)
+    # id = post['_id']
 
-    print(type(author))
-    for pic in author:
-        print(pic)
+    # author = find_blog_post(id)
+
+    # print(type(author))
+    # for pic in author:
+        # print(pic)
     
 
     
 
-    return render_template('public/post.html',post=post,author=author)
+    return render_template('public/post.html',post=check_token,author=check_token[0][1])
 
 
 

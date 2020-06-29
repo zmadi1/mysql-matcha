@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    socket.on('Notification', msg => {
+    socket.on('notification', msg => {
 
         console.log(msg)
 
