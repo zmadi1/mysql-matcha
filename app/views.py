@@ -1324,7 +1324,7 @@ def account():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
 
-    return render_template('public/account.html',form=form,existing_user=existing_user[0])
+    return render_template('public/account.html',form=form,existing_user=existing_user[0],notification=notification)
 
 
 @app.route("/post/new",methods=['GET','POST'])
