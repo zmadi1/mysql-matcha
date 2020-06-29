@@ -133,7 +133,16 @@
     <!-- <li class="nav-item">
       <a class="nav-link" >LOGIN</a>
       </li> -->
+      <!-- SMS Notification -->
+      <a href="{{ url_for('jinja')}}">
+          <button type="button"  id="notification" class="btn-info" style="border-radius: 25%; height: 85%"> 
+          
+            <li><i class="material-icons" style="font-size:250%;">sms</i></li>
+            
+          </button>
+        </a>
       <li class="nav-item active">
+          
           <a class="dropdown-item" href="{{ url_for('logout') }}">SIGN OUT</a>
         <!-- <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a> -->
         <!-- <div class="dropdown-menu" aria-labelledby="navbarDropdown"> -->
