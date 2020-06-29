@@ -28,7 +28,7 @@ mail = Mail(app)
 
 
 
-geod = pyproj.Geod(ellps='WGS84')
+# geod = pyproj.Geod(ellps='WGS84')
 
 #Initialize the Flask-SocketIO
 socketio = SocketIO(app)
@@ -1324,7 +1324,7 @@ def account():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
 
-    return render_template('public/account.html',form=form,existing_user=existing_user[0],notification=notification)
+    return render_template('public/account.html',form=form,existing_user=existing_user[0],notification=notification,isHere=True)
 
 
 @app.route("/post/new",methods=['GET','POST'])
