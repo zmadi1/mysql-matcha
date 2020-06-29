@@ -10,7 +10,7 @@ class Config(object):
     MAX_IMAGE_FILESIZE = 0.5 * 1024 * 1024
     # IMAGE_UPLOADS="/home/zakhele/Documents/app/app/static/img"
     
-    UPLOADS="/home/zakhele/Desktop/Matcha-version2/app/static/img"
+    UPLOADS="/home/mshengu/Desktop/mysql-matcha/app/static/img"
     SESSION_COOKIE_SECURE = True
 
 
@@ -34,10 +34,10 @@ class DevelopmentConfig(Config):
     DB_NAME="develpment-db"
     DB_USERNAME="root"
     DB_PASSWORD=""
-    IMAGE_UPLOADS = "/home/zakhele/Desktop/Matcha-version2/app/static/img"
+    IMAGE_UPLOADS = "/home/mshengu/Desktop/mysql-matcha/app/static/img"
     ALLOWED_IMAGE_EXTENSIONS = ["PNG","JPG","JPEG","GIF"]
 
-    UPLOADS="/home/zakhele/Documents/app/app/static/img"
+    UPLOADS="/home/mshengu/Desktop/mysql-matcha/app/static/img"
     SESSION_COOKIE_SECURE=False
 
 class TestingConfig(Config):
@@ -48,5 +48,5 @@ class TestingConfig(Config):
     DB_PASSWORD=""
     SECRET_KEY = 'the waters'
 
-    UPLOADS ="/home/zakhele/Documents/app/app/static/img"
+    UPLOADS ="/home/mshengu/Desktop/mysql-matcha/app/static/img"
     SESSION_COOKIE_SECURE=False
