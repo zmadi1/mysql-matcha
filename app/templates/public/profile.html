@@ -1,0 +1,142 @@
+{% include 'public/templates/navbar.html'%}
+
+{% include 'public/templates/public_templates.html'%}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+{% if user %}
+
+{% block notify %}{% endblock %}
+
+{% endif %}
+<div class="content-section">
+    <img class="rounded-circle account-img" src="{{ url_for('static',filename='img/'+profile)}}">
+    <div>
+
+        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+        <style>
+
+            #issMap{
+                height: 180px;
+            }
+        </style>
+        <div id="issMap"></div>
+
+    </div> 
+    <div class="row">
+        <div class="col-md-8">
+            <div class="container">      
+           
+                <article class="media content-section">
+                    <div class="media">
+                        <div class="media-body" style="overflow-x:auto;">  
+                           
+                            {% for user in  posts %}
+                          
+                            <h5>
+                                {{users[loop.index - 1 ]}}
+                            </h5>
+                            <a href="{{ url_for('post',post_id=users[loop.index - 1]) }}" id="{{users[loop.index - 1]}}" class="link" ><img  id="profle" class="rounded-circle " src="{{ url_for('static',filename='img/'+user[0])}}" alt="" height="100" width="100" class="img-fluid img-thumbnail"></a>
+                            <button name="{{users[loop.index - 1]}}" value="{{existing_user[1]}}" id="like"  type="button" class="btn btn-success"><i class="fa fa-heart"></i></button>
+                            <button name="{{ users[loop.index - 1] }}" value="{{existing_user[1]}}" id="dislike" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>                            
+                            {% endfor %}
+                          
+                           
+                            </div>
+                        </div>    
+                    </div>
+                </article>
+                <script>
+                    const username = `{{existing_user[1]}}`
+                    console.log(username)
+                </script>
+            </div>
+            <div class="col-md-4">
+                <div class="content-section">
+                  <h3>Hashtag bar</h3>
+                    <p class='text-muted'>Trending.
+                      <ul class="list-group">
+                        <p>
+                            <div id="enter" class="tags-input" data-name="tags-input">
+                               
+                            </div>
+                            <script src="{{ url_for('static',filename='js/tag.js')}}"></script>
+                        </p>
+                        <div>
+                        </div>
+                      </ul>
+                    </p> 
+                </div>
+            </div> 
+        </div>
+
+    </div>   
+</div>
+</div>
+
+{% endblock %}
+{% block script %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<script>
+    var socket = io.connect(`http://${document.domain}:${location.port}`);
+    const profile = document.querySelectorAll('.link')
+    
+    profile.forEach((item) => {
+        
+        item.addEventListener('click',(e) =>{
+            const persons = e.currentTarget.id
+            const logged_user = e.currentTarget.value
+            
+            data= {
+                'time':Date.now(),
+                'id':"viewed",
+                'owner':username,
+                'user':persons,
+                
+            }
+            alert(data['owner'])
+            
+            
+            socket.emit('open_profile',data)
+        })
+    })
+    
+
+        $(document).ready(function(){
+            
+            
+            $("button").bind("click", function(e){
+                const value = e.currentTarget.value;
+                const id = e.currentTarget.id
+                const user = e.currentTarget.name;
+                // const owner = e.target.id;
+                
+                data = {
+                    'time':Date.now(),
+                    'id':id,
+                    'user':user,
+                    'owner':value
+                }
+            
+                socket.emit('like',data)
+                
+                socket.on(value,msg =>{
+                    // alert(`${msg.owner} has liked your profile`)
+                })
+                
+                
+            });
+        });
+        // }
+        
+        </script>
+
+<link rel="stylesheet" href="{{ url_for('static',filename='css/tag.css')}}">
+<script src="{{url_for('static',filename='js/profile.js')}}"></script>
+{% endblock %}
