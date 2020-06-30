@@ -1,11 +1,8 @@
-{% include 'public/templates/navbar.html' %}
-
 {% extends 'public/templates/public_templates.html'%}
 
 {% block title %}Profile{% endblock %}
 
 {% block main %}
-{% block notify %}{% endblock %}
 <article>
     <div class="content-section">
         <div class="row">
@@ -19,10 +16,7 @@
                   <table>
                     <tr valign="top">
                       <div class="container">
-                        
-                        
-                        
-                        
+
                         <td>
                           <h6><b>User:</b> {{ post[1] }}</h6>
                           <p></p><b>Bio:</b>{{ post[7] }}</p>
@@ -37,25 +31,11 @@
                     </table>
                   </div>
                     <hr>
-                  <div class="container">
-                    {% for i in author.pictures %}
-                    <p>{{ i }}</p>
-                    <td><img class="rounded-circle  " src="{{ url_for('static',filename='img/'+i)}}" height="100" width="100" alt="" class="img-fluid"></td>
-           
-                    {% endfor %}
-
                   </div>
-
-                
-                <p>
-                </p>
                 </div>
                
-                
-              
-          
                 <div>
-                    <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_post',post_id=posts)}}">Update</a>
+       
                     <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
                 </div>
          
@@ -76,18 +56,17 @@
                         </div>
                       </div>
                     </div>
-                  </div>
-         
-                
+                  </div> 
             </div>
            
         </div>
     </div>
     <script>
                     
-      const likes = `{{  liked_number }}`
-      const username = `{{ post.username}}`
+      const likes = `{{  post[15] }}`
+      const username = `{{ post[1]}}`
   </script>
+ 
 </div>
 </article>
 <!-- Modal -->
