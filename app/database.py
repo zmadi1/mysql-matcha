@@ -311,6 +311,17 @@ def create_users(form):
             print(err)
             raise
         
+
+        #    cursor.execute(f"""CREATE TABLE IF NOT EXISTS `messages`
+        #         (
+        #             message_id VARCHAR(200) NOT NULL,
+        #             user_id VARCHAR(200) NOT NULL,
+        #             message TEXT NOT NULL,
+        #             username VARCHAR(100) NOT NULL,
+        #             epoch VARCHAR(250) NOT NULL,  
+        #             PRIMARY KEY(message_id),
+        #             FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+        #         )""")
         try:
             cursor.execute(
             """
@@ -319,6 +330,7 @@ def create_users(form):
                 user_id VARCHAR(200) NOT NULL,
                 username VARCHAR(100), 
                 PRIMARY KEY(liked_id),
+                epoch VARCHAR(250) NOT NULL,
                 FOREIGN KEY(user_id) REFERENCES `users`(user_id))
             """
             )
@@ -335,6 +347,7 @@ def create_users(form):
                 user_id VARCHAR(200) NOT NULL,
                 username VARCHAR(100), 
                 PRIMARY KEY(likes_id),
+                epoch VARCHAR(250) NOT NULL,
                 FOREIGN KEY(user_id) REFERENCES `users`(user_id)
                 )
             """

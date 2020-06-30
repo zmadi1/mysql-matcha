@@ -215,25 +215,33 @@ def open_profile(data):
         cursor.execute(f"SELECT * FROM  `users` WHERE `username`='{data['user']}'")
 
         user = cursor.fetchone()
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM  `users` WHERE `username`='{data['owner']}'")
+
+        owner = cursor.fetchone()
     
     
  
     print(":::::::::::::::::::::::::::::this is where we are:::::::")
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`) VALUES('{liked_id}','{id}','{data['user']}')")
+        # cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['time']}')")
+        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`epoch`) VALUES('{liked_id}',(SELECT `user_id` FROM `users` WHERE `username`='{data['user']}'),'{data['user']}','{data['time']}')")
         cnx.commit()
 
     # print(f"{user}&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
-        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE `username` ='{data['user']}'")
+        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE `user_id` ='{user[0]}'")
         
         old_user=cursor.fetchall()
         cnx.commit()
         
     print(f"{old_user}+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print(f"{owner[0]}******************************************************************************************************")
     # print(other_username)
     # updating notification that someone has liked my profile
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
@@ -570,7 +578,7 @@ def handle_my_custom_event(data):
 
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}')")
+        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['time']}')")
         
         cnx.commit()
 
@@ -580,7 +588,7 @@ def handle_my_custom_event(data):
     #Recording that i have liked someone
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}')")
+        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['time']}')")
         
         cnx.commit()
         
@@ -601,7 +609,7 @@ def handle_my_custom_event(data):
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
         # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
-        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{other_username}'")
+        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
         cnx.commit()
         
         
@@ -1150,9 +1158,9 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-                                    print(pic[0])
-                                    print('-----------------------')
-                                    print(picture)
+                                    # print(pic[0])
+                                    # print('-----------------------')
+                                    # print(picture)
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])
