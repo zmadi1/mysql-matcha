@@ -228,7 +228,7 @@ def open_profile(data):
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
         # cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['time']}')")
-        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`epoch`) VALUES('{liked_id}',(SELECT `user_id` FROM `users` WHERE `username`='{data['user']}'),'{data['user']}','{data['time']}')")
+        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{liked_id}',(SELECT `user_id` FROM `users` WHERE `username`='{data['user']}'),'{data['owner']}','{data['id']}','{data['time']}')")
         cnx.commit()
 
     # print(f"{user}&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
@@ -574,49 +574,95 @@ def handle_my_custom_event(data):
         
         other_user = cursor.fetchall()
 
-
-
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['time']}')")
-        
-        cnx.commit()
-
-        
-
     
-    #Recording that i have liked someone
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['time']}')")
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor() 
+        cursor.execute(f"SELECT * FROM `liked` WHERE `username`='{user[0][1]}'")
         
-        cnx.commit()
+        you_liked = cursor.fetchall()
+
+    # print(you_liked)
+    print(other_user)
+    # print(user[0][0])
+    if you_liked !=[]:
+        for i in you_liked:
+            if i[1] != other_user[0][0]:
+            
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor=cnx.cursor()
+                    cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['id']}','{data['time']}')")
+
+                    cnx.commit()
+
+
+
+
+                #Recording that i have liked someone
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor=cnx.cursor()
+                    cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['id']}','{data['time']}')")
+
+                    cnx.commit()
+                
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor=cnx.cursor()
+                    cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
         
+                    old_user=cursor.fetchall()
+                    cnx.commit()
+        
+                print(old_user[0][0])
+                print(other_username)
+                # updating notification that someone has liked my profile
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor=cnx.cursor()
+                    # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+                    cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
+                    cnx.commit()
+
+
+                print(f"This is the room {other_user[0][1]}")
+                socketio.emit('notification',data,room=other_user[0][1])
+        else:
+            print("You can't like the same user for more than one")
+    else:
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor=cnx.cursor()
+            cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['id']}','{data['time']}')")
+            cnx.commit()
+
+
+        #Recording that i have liked someone
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor=cnx.cursor()
+            cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['id']}','{data['time']}')")
+            cnx.commit()
+                
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor=cnx.cursor()
+            cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
+
+            old_user=cursor.fetchall()
+            cnx.commit()
+        
+        print(old_user[0][0])
+        print(other_username)
+        # updating notification that someone has liked my profile
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor=cnx.cursor()
+            # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+            cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
+            cnx.commit()
+                    
+                    
+        print(f"This is the room {other_user[0][1]}")
+        socketio.emit('notification',data,room=other_user[0][1])
+
 
 
     
    
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor=cnx.cursor()
-        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
-        
-        old_user=cursor.fetchall()
-        cnx.commit()
-        
-    print(old_user[0][0])
-    print(other_username)
-    # updating notification that someone has liked my profile
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor=cnx.cursor()
-        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
-        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
-        cnx.commit()
-        
-        
-        print(f"This is the room {other_user[0][1]}")
 
-
-    socketio.emit('notification',data,room=other_user[0][1])
 
 
 
