@@ -624,6 +624,7 @@ def handle_my_custom_event(data):
                 print(f"This is the room {other_user[0][1]}")
                 socketio.emit('notification',data,room=other_user[0][1])
         else:
+            flash("You can't like the same user for more than one",'danger')
             print("You can't like the same user for more than one")
     else:
         with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
@@ -678,13 +679,48 @@ def jinja():
 
     id = session.get('USER')
 
-    existing_user =  find_id(id)
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{id}'")
+        
+        old_user=cursor.fetchall()
+        cnx.commit()
+    
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM `users` WHERE user_id ='{id}'")
+        
+        user=cursor.fetchall()
+        cnx.commit()
+        
+    print(old_user[0][0])
+    # print(other_username)
+    # updating notification that someone has liked my profile
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+        cursor.execute(f"UPDATE  `users` SET `notification_numb`='{old_user[0][0]}'  WHERE username='{user[0][1]}'")
+        cnx.commit()
+
+    
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+        cursor.execute(f"SELECT * FROM  `users`  WHERE user_id='{id}'")
+        notification_numb=cursor.fetchall()
+
+        # cnx.commit()
 
 
-    profile = []
-    for i in existing_user['liked']:
+    # existing_user =  find_id(id)
+
+
+    # profile = []
+    # for i in existing_user['liked']:
         # user = find_user(i['owner'])
-        profile.append(i)
+        # profile.append(i)
     
         # for k in existing_user['profile_open']:
         #     # user = find_user(k['owner'])
@@ -695,11 +731,11 @@ def jinja():
     # if len(existing_user['liked']) == 0:
     # for k in existing_user['profile_open']:
     #     profile.append(k)
-    profile = sorted(profile,key=itemgetter('time'))   
+    # profile = sorted(profile,key=itemgetter('time'))   
 
-    notification_numb = existing_user['notification']
+    # notification_numb = existing_user['notification']
 
-    insert_notification(id,notification_numb)
+    # insert_notification(id,notification_numb)
 
     my_name = 'madi'
 
@@ -748,7 +784,7 @@ def jinja():
 
     suspicious = '<script>alert("YOU GOT HACKED")</script>'
 
-    return render_template('public/jinja.html',notification_numb=notification_numb,profile=profile,existing_user=existing_user,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
+    return render_template('public/jinja.html',notification_numb=notification_numb,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
     langs=langs,friends=friends,colours=colours,gitremote=gitremote,repeat=repeat
     )
 
@@ -1116,7 +1152,7 @@ def profile():
         id=session.get("USER")
         # existing_user = find_id(id)
         # existing_blog_post = find_blog_post(id)
-        
+        # flash("This is the profile",'danger')
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
             
@@ -1241,7 +1277,7 @@ def profile():
             # response = make_response(jsonify(req))
             # return response
 
-    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
     # else:
         # print("Userename not found in session")
         # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
@@ -1421,8 +1457,9 @@ def account():
             upd_sexual(form)
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
+        
 
-    return render_template('public/account.html',form=form,existing_user=existing_user[0],notification=notification)
+    return render_template('public/account.html',notification_numb=existing[-1],form=form,existing_user=existing_user[0],notification=notification)
 
 
 @app.route("/post/new",methods=['GET','POST'])
