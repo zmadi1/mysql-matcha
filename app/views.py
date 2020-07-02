@@ -722,6 +722,13 @@ def jinja():
 
     id = session.get('USER')
 
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        
+        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+        existing_user = cursor.fetchone()
+    
+
 
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
@@ -843,7 +850,7 @@ def jinja():
 
     suspicious = '<script>alert("YOU GOT HACKED")</script>'
 
-    return render_template('public/jinja.html',notification_numb=notification_numb,Profile=Profile,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
+    return render_template('public/jinja.html',notification_numb=existing_user[-1],Profile=Profile,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
     langs=langs,friends=friends,colours=colours,gitremote=gitremote,repeat=repeat
     )
 
@@ -1849,6 +1856,17 @@ def post(post_id):
     user =post_id
     # id = str(post_id)
     # print(id)
+
+    id = session.get("USER")
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        
+        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+        existing_user = cursor.fetchone()
+
+
+
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         cursor=cnx.cursor()
     
@@ -1858,6 +1876,7 @@ def post(post_id):
     print(f"%%%%%%%%%%%%%%%%%%%%%{check_token}")
     post=check_token
     author=check_token
+
     # print(check_token)
 
     # id = post['_id']
@@ -1871,7 +1890,7 @@ def post(post_id):
 
     
 
-    return render_template('public/post.html',post=post,author=author)
+    return render_template('public/post.html',post=post,author=author,notification=existing_user[-2],notification_numb=existing_user[-1])
 
 
 
