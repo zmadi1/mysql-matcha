@@ -28,7 +28,7 @@ mail = Mail(app)
 
 
 
-# geod = pyproj.Geod(ellps='WGS84')
+geod = pyproj.Geod(ellps='WGS84')
 
 #Initialize the Flask-SocketIO
 socketio = SocketIO(app)
@@ -196,23 +196,75 @@ def leave(data):
 @socketio.on('open_profile')
 def open_profile(data):
 
+    liked_id = secrets.token_urlsafe()
+
+    id = session.get('USER')
+
     #The person who their profile has been opened.
     post_id= data['user']
+
+
+    print("????????????????????????????????????????????????????????")
+    print(data)
+    print(data['user'])
     # print(post_id)
     # current_user
-    user = find_user(post_id)
 
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM  `users` WHERE `username`='{data['user']}'")
+
+        user = cursor.fetchone()
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM  `users` WHERE `username`='{data['owner']}'")
+
+        owner = cursor.fetchone()
+    
+    
+ 
+    print(":::::::::::::::::::::::::::::this is where we are:::::::")
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        # cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['time']}')")
+        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{liked_id}',(SELECT `user_id` FROM `users` WHERE `username`='{data['user']}'),'{data['owner']}','{data['id']}','{data['time']}')")
+        cnx.commit()
+
+    # print(f"{user}&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE `user_id` ='{user[0]}'")
+        
+        old_user=cursor.fetchall()
+        cnx.commit()
+        
+    print(f"{old_user}+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print(f"{owner[0]}******************************************************************************************************")
+    # print(other_username)
+    # updating notification that someone has liked my profile
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
+        cnx.commit()
+        
+        
+        # print(f"This is the room {other_user[0][1]}")
+
+    print(data['user'])
     # push_user_open_your_profile(post_id,data)
     #push that someone has viewed my profile
-    push_user_liked_you(post_id,data)
+    # push_user_liked_you(post_id,data)
 
 
-    current = find_user(post_id)
+    # current = find_user(post_id)
     #checking whether someone has viewd my profile
-    current = len(current['liked'])
+    # current = len(current['liked'])
 
     #updating notification that someone has liked my profile
-    notification_update(post_id,current)
+    # notification_update(post_id,current)
 
     
     # print('hello')
@@ -222,7 +274,7 @@ def open_profile(data):
     # notification_update( ola_user['username'],ola_noti_user)
 
     # post = find_user(user_post)
-    socketio.emit('Notification',data,room=post_id)
+    socketio.emit('notification',data,room=data['user'])
     # print("Phakathi inside we did it, what's is up bitches!!!!!!!!!")
 
 
@@ -454,8 +506,8 @@ def handle_event(data):
     message_id =secrets.token_urlsafe()
     if data is not None:
         messages = data
-        # print(data['room'])
-        # print(messages)
+        print(data['room'])
+        print(messages)
         if messages != {}:
 
             with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
@@ -522,56 +574,146 @@ def handle_my_custom_event(data):
         
         other_user = cursor.fetchall()
 
-
-
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}')")
-        
-        cnx.commit()
-
-        
-
     
-    #Recording that i have liked someone
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor=cnx.cursor()
-        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}')")
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor() 
+        cursor.execute(f"SELECT * FROM `liked` WHERE `username`='{user[0][1]}'")
         
-        cnx.commit()
+        you_liked = cursor.fetchall()
+
+    # print(you_liked)
+    print(other_user)
+    # print(user[0][0])
+    if you_liked !=[]:
+        for i in you_liked:
+            if i[1] != other_user[0][0]:
+                if i[3] != data['id']:
+
+            
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['id']}','{data['time']}')")
+
+                        cnx.commit()
+
+
+
+
+                    #Recording that i have liked someone
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['id']}','{data['time']}')")
+
+                        cnx.commit()
+                
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
+
+                        old_user=cursor.fetchall()
+                        cnx.commit()
         
+                    print(old_user[0][0])
+                    print(other_username)
+                    # updating notification that someone has liked my profile
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+                        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
+                        cnx.commit()
+
+
+                    # print(f"This is where the ids are not the same")
+                    # print("What just happend????????????????????????????")
+                    socketio.emit('notification',data,room=other_user[0][1])
+        else:
+            if i[3] != data['id']:
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor=cnx.cursor()
+                    cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['id']}','{data['time']}')")
+
+                    cnx.commit()
+
+
+
+
+                #Recording that i have liked someone
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor=cnx.cursor()
+                    cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['id']}','{data['time']}')")
+
+                    cnx.commit()
+                
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor=cnx.cursor()
+                    cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
+        
+                    old_user=cursor.fetchall()
+                    cnx.commit()
+        
+                print(old_user[0][0])
+                print(other_username)
+                # updating notification that someone has liked my profile
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor=cnx.cursor()
+                    # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+                    cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
+                    cnx.commit()
+
+
+                # print(f"This is where the ids are not the same.")
+                
+                socketio.emit('notification',data,room=other_user[0][1])
+            else:
+                print("This is where we are")
+                print("The id's are the same.")
+             
+    else:
+        # print("What just happend????????????????????????????")
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor=cnx.cursor()
+            cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['id']}','{data['time']}')")
+            cnx.commit()
+
+
+        #Recording that i have liked someone
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor=cnx.cursor()
+            cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['id']}','{data['time']}')")
+            cnx.commit()
+                
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor=cnx.cursor()
+            cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
+
+            old_user=cursor.fetchall()
+            cnx.commit()
+        
+        print(old_user[0][0])
+        print(other_username)
+        # updating notification that someone has liked my profile
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor=cnx.cursor()
+            # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+            cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
+            cnx.commit()
+                    
+                    
+        print(f"This is the room {other_user[0][1]}")
+        socketio.emit('notification',data,room=other_user[0][1])
+
 
 
     
    
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor=cnx.cursor()
-        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
-        
-        old_user=cursor.fetchall()
-        cnx.commit()
-        
-    # print(old_user[0][0])
-    # print(other_username)
-    # updating notification that someone has liked my profile
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor=cnx.cursor()
-        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
-        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{other_username}'")
-        cnx.commit()
-        
-        
-        print(f"This is the room {other_user[0][1]}")
 
-
-    socketio.emit('notification',data,room=other_user[0][1])
 
 
 
 @app.template_filter('low')  
 def low(t):
     # time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(1347517370))
-    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t/1000.0))
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(t)/1000.0))
 
 @app.route('/jinja')
 def jinja():
@@ -580,13 +722,64 @@ def jinja():
 
     id = session.get('USER')
 
-    existing_user =  find_id(id)
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{id}'")
+        
+        old_user=cursor.fetchall()
+        cnx.commit()
+    
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM `users` WHERE user_id ='{id}'")
+        
+        user=cursor.fetchall()
+        cnx.commit()
+        
+    print(old_user[0][0])
+    # print(other_username)
+    # updating notification that someone has liked my profile
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+        cursor.execute(f"UPDATE  `users` SET `notification_numb`='{old_user[0][0]}'  WHERE username='{user[0][1]}'")
+        cnx.commit()
+
+    
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+        cursor.execute(f"SELECT * FROM  `users`  WHERE user_id='{id}'")
+        notification_numb=cursor.fetchall()
+
+        # cnx.commit()
+    
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM `liked` WHERE user_id ='{id}'")
+        
+        Profile=cursor.fetchall()
+    
+    Profile = sorted(Profile,key=itemgetter(4))
+    Profile.reverse()
+    # for i in profile:
+    #     print(i)
+    
+
+    # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    # for i in Profile:
+    #     print(i)
+
+    # existing_user =  find_id(id)
 
 
-    profile = []
-    for i in existing_user['liked']:
+    # profile = []
+    # for i in existing_user['liked']:
         # user = find_user(i['owner'])
-        profile.append(i)
+        # profile.append(i)
     
         # for k in existing_user['profile_open']:
         #     # user = find_user(k['owner'])
@@ -597,11 +790,11 @@ def jinja():
     # if len(existing_user['liked']) == 0:
     # for k in existing_user['profile_open']:
     #     profile.append(k)
-    profile = sorted(profile,key=itemgetter('time'))   
+       
 
-    notification_numb = existing_user['notification']
+    # notification_numb = existing_user['notification']
 
-    insert_notification(id,notification_numb)
+    # insert_notification(id,notification_numb)
 
     my_name = 'madi'
 
@@ -650,7 +843,7 @@ def jinja():
 
     suspicious = '<script>alert("YOU GOT HACKED")</script>'
 
-    return render_template('public/jinja.html',notification_numb=notification_numb,profile=profile,existing_user=existing_user,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
+    return render_template('public/jinja.html',notification_numb=notification_numb,Profile=Profile,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
     langs=langs,friends=friends,colours=colours,gitremote=gitremote,repeat=repeat
     )
 
@@ -1018,7 +1211,7 @@ def profile():
         id=session.get("USER")
         # existing_user = find_id(id)
         # existing_blog_post = find_blog_post(id)
-        
+        # flash("This is the profile",'danger')
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
             
@@ -1120,17 +1313,46 @@ def profile():
                 print(existing_user[-2])
         
         # interest_return = list(dict.fromkeys(interest_return))
-
+        gis_id =secrets.token_urlsafe()
         # pagination =users_pagination()
         # post = []
         # for i in posts:
         #     for k in i:
         #         post.append(k)
         
-        # if request.is_json:
-        #     req = request.get_json()
+        if request.is_json:
+            req = request.get_json()
 
-        #     if len(existing_user['coordinates']) == 0:
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor=cnx.cursor()
+                cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS `location`(
+                gis_id VARCHAR(100) ,
+                user_id VARCHAR(200) NOT NULL,
+                location JSON, 
+                PRIMARY KEY(gis_id),
+                FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+                )
+                """
+                )
+                cnx.commit()
+
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor = cnx.cursor()
+                cursor.execute(f"SELECT COUNT(*) FROM `location` WHERE `user_id`='{existing_user[0]}'")
+                length = cursor.fetchall()
+
+            print(req)
+            print(length[0][0])
+            if length[0][0] == 0:
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor = cnx.cursor()
+
+                    cursor.execute(f"""INSERT INTO `location`(`gis_id`,`user_id`,`location`)  VALUES("{gis_id}","{existing_user[0]}","{req}")""")
+                    cnx.commit()
+
+            # if len(existing_user['coordinates']) == 0:
         #         coordinates_update(existing_user,req)
 
         #     coord =[]
@@ -1145,7 +1367,7 @@ def profile():
             # response = make_response(jsonify(req))
             # return response
 
-    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
     # else:
         # print("Userename not found in session")
         # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
@@ -1583,8 +1805,9 @@ def account():
             upd_sexual(form)
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
+        
 
-    return render_template('public/account.html',form=form,existing_user=existing_user[0],notification=notification,isHere=True)
+    return render_template('public/account.html',notification_numb=existing[-1],form=form,existing_user=existing_user[0],notification=notification,isHere=True)
 
 
 @app.route("/post/new",methods=['GET','POST'])
@@ -1608,8 +1831,10 @@ def post(post_id):
         cursor.execute(f"SELECT * FROM `users` WHERE `username`= '{user}'")
         check_token = cursor.fetchone()
 
-
-    print(check_token)
+    print(f"%%%%%%%%%%%%%%%%%%%%%{check_token}")
+    post=check_token
+    author=check_token
+    # print(check_token)
 
     # id = post['_id']
 
@@ -1622,7 +1847,7 @@ def post(post_id):
 
     
 
-    return render_template('public/post.html',post=check_token,author=check_token[0][1])
+    return render_template('public/post.html',post=post,author=author)
 
 
 

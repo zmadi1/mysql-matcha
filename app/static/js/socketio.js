@@ -65,6 +65,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.message_holder').scrollTop = document.querySelector('.message_holder').scrollHeight;
     })
 
+<<<<<<< HEAD
+=======
+    // open-profile
+    socket.on('open-profile', msg => {
+        console.log(msg)
+        // const span_timestamp = document.createElement('span')
+        // span_timestamp.innerHTML = msg.time_stamp
+        // console.log(msg)
+        // console.log(Date())
+        // // $('div.message_holder').append(span_timestamp.innerHTML)
+        // $('div.message_holder').append(`<div><b style="color: #000">${msg['owner']}</b> has ${msg['id']} your profile</div>`)
+        // document.querySelector('.message_holder').scrollTop = document.querySelector('.message_holder').scrollHeight;
+    })
+
+>>>>>>> 275438f61aaf0859e028f4a2c82507bb46548309
 
     //Room selection
     document.querySelectorAll('.select-room').forEach(p => {
