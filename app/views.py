@@ -670,7 +670,7 @@ def handle_my_custom_event(data):
 @app.template_filter('low')  
 def low(t):
     # time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(1347517370))
-    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t/1000.0))
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(t)/1000.0))
 
 @app.route('/jinja')
 def jinja():
@@ -712,7 +712,23 @@ def jinja():
         notification_numb=cursor.fetchall()
 
         # cnx.commit()
+    
 
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM `liked` WHERE user_id ='{id}'")
+        
+        Profile=cursor.fetchall()
+    
+    Profile = sorted(Profile,key=itemgetter(4))
+    Profile.reverse()
+    # for i in profile:
+    #     print(i)
+    
+
+    # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    # for i in Profile:
+    #     print(i)
 
     # existing_user =  find_id(id)
 
@@ -731,7 +747,7 @@ def jinja():
     # if len(existing_user['liked']) == 0:
     # for k in existing_user['profile_open']:
     #     profile.append(k)
-    # profile = sorted(profile,key=itemgetter('time'))   
+       
 
     # notification_numb = existing_user['notification']
 
@@ -784,7 +800,7 @@ def jinja():
 
     suspicious = '<script>alert("YOU GOT HACKED")</script>'
 
-    return render_template('public/jinja.html',notification_numb=notification_numb,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
+    return render_template('public/jinja.html',notification_numb=notification_numb,Profile=Profile,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
     langs=langs,friends=friends,colours=colours,gitremote=gitremote,repeat=repeat
     )
 
@@ -1252,17 +1268,46 @@ def profile():
                 print(existing_user[-2])
         
         # interest_return = list(dict.fromkeys(interest_return))
-
+        gis_id =secrets.token_urlsafe()
         # pagination =users_pagination()
         # post = []
         # for i in posts:
         #     for k in i:
         #         post.append(k)
         
-        # if request.is_json:
-        #     req = request.get_json()
+        if request.is_json:
+            req = request.get_json()
 
-        #     if len(existing_user['coordinates']) == 0:
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor=cnx.cursor()
+                cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS `location`(
+                gis_id VARCHAR(100) ,
+                user_id VARCHAR(200) NOT NULL,
+                location JSON, 
+                PRIMARY KEY(gis_id),
+                FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+                )
+                """
+                )
+                cnx.commit()
+
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor = cnx.cursor()
+                cursor.execute(f"SELECT COUNT(*) FROM `location` WHERE `user_id`='{existing_user[0]}'")
+                length = cursor.fetchall()
+
+            print(req)
+            print(length[0][0])
+            if length[0][0] == 0:
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor = cnx.cursor()
+
+                    cursor.execute(f"""INSERT INTO `location`(`gis_id`,`user_id`,`location`)  VALUES("{gis_id}","{existing_user[0]}","{req}")""")
+                    cnx.commit()
+
+            # if len(existing_user['coordinates']) == 0:
         #         coordinates_update(existing_user,req)
 
         #     coord =[]

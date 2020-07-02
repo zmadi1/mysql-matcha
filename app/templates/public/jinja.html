@@ -14,20 +14,20 @@
             <hr>
             <ul>
             
-            {% for lang in profile %}
+            {% for lang in Profile %}
 
                 
                 <li>
                     <p>
                       
                        <b>
-                           <a href="{{url_for('post',post_id=lang.owner)}}">
+                           <a href="{{url_for('post',post_id=lang[2])}}">
 
-                               {{ lang.owner }} :
+                               {{ lang[2] }} :
                            </a>
                        </b>
                         <!-- has open your profile -->
-                        has {{lang.id}} your profile at {{ lang.time|low }}
+                        has {{lang[3]}} your profile at {{ lang[4]|low }}
                      
                      
                         <!-- {{lang[loop.index-1]}} your profile  -->
