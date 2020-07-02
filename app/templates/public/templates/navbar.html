@@ -48,7 +48,7 @@
               border-radius: 6px 0 6px 6px;
           }
       </style>
-    <nav class="navbar navbar-expand-lg" style="background-color:#ccc">
+    <nav class="navbar navbar-expand-lg" style="background-color:#d39e00">
       <div class="tab-content">
         
       </div>
@@ -63,7 +63,7 @@
           {% else %}
         <a href="{{ url_for('jinja')}}" class="notification">
           <button type="button"  id="notification" class="btn btn-info">Notification 
-          <span   id="badge" class="badge badge-steel">{{notification}}</span>
+          <span   id="badge" class="badge badge-steel">{{notification - notification_numb}}</span>
             <i class="fa fa-bell"></i>
             
           </button>
@@ -105,7 +105,7 @@
                             </ul>
                           </li> -->
                         <li class="dropdown-submenu">
-                            <a  class="dropdown-item" tabindex="-1" href="#">By Sexual Preference</a>
+                            <a  class="d{% block notify %}{% endblock %}opdown-item" tabindex="-1" href="#">By Sexual Preference</a>
                             <ul class="dropdown-menu">
                               <li class="dropdown-item"><a tabindex="-1" href="{{ url_for('gen_male')}}">Male</a></li>                              
                               <li class="dropdown-item"><a href="{{ url_for('gen_female')}}">Female</a></li>
@@ -136,7 +136,7 @@
       {% if  isUpdate%}
         <p></p>
       {% else %}
-      <a href="{{ url_for('message')}}">
+      <a href="{{ url_for('jinja')}}">
           <button type="button"  id="notification" class="btn-info" style="border-radius: 25%; height: 85%"> 
           
             <li><i class="material-icons" style="font-size:250%;">sms</i></li>
