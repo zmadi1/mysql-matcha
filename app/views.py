@@ -28,7 +28,7 @@ mail = Mail(app)
 
 
 
-# geod = pyproj.Geod(ellps='WGS84')
+geod = pyproj.Geod(ellps='WGS84')
 
 #Initialize the Flask-SocketIO
 socketio = SocketIO(app)
@@ -196,23 +196,67 @@ def leave(data):
 @socketio.on('open_profile')
 def open_profile(data):
 
+    liked_id = secrets.token_urlsafe()
+
+    id = session.get('USER')
+
     #The person who their profile has been opened.
     post_id= data['user']
+
+
+    print("????????????????????????????????????????????????????????")
+    print(data)
+    print(data['user'])
     # print(post_id)
     # current_user
-    user = find_user(post_id)
 
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM  `users` WHERE `username`='{data['user']}'")
+
+        user = cursor.fetchone()
+    
+    
+ 
+    print(":::::::::::::::::::::::::::::this is where we are:::::::")
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`) VALUES('{liked_id}','{id}','{data['user']}')")
+        cnx.commit()
+
+    # print(f"{user}&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE `username` ='{data['user']}'")
+        
+        old_user=cursor.fetchall()
+        cnx.commit()
+        
+    print(f"{old_user}+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    # print(other_username)
+    # updating notification that someone has liked my profile
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
+        cnx.commit()
+        
+        
+        # print(f"This is the room {other_user[0][1]}")
+
+    print(data['user'])
     # push_user_open_your_profile(post_id,data)
     #push that someone has viewed my profile
-    push_user_liked_you(post_id,data)
+    # push_user_liked_you(post_id,data)
 
 
-    current = find_user(post_id)
+    # current = find_user(post_id)
     #checking whether someone has viewd my profile
-    current = len(current['liked'])
+    # current = len(current['liked'])
 
     #updating notification that someone has liked my profile
-    notification_update(post_id,current)
+    # notification_update(post_id,current)
 
     
     # print('hello')
@@ -222,7 +266,7 @@ def open_profile(data):
     # notification_update( ola_user['username'],ola_noti_user)
 
     # post = find_user(user_post)
-    socketio.emit('Notification',data,room=post_id)
+    socketio.emit('notification',data,room=data['user'])
     # print("Phakathi inside we did it, what's is up bitches!!!!!!!!!")
 
 
@@ -1584,7 +1628,7 @@ def account():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
 
-    return render_template('public/account.html',form=form,existing_user=existing_user[0],notification=notification,isHere=True)
+    return render_template('public/account.html',form=form,existing_user=existing_user[0],notification=notification)
 
 
 @app.route("/post/new",methods=['GET','POST'])
@@ -1608,8 +1652,10 @@ def post(post_id):
         cursor.execute(f"SELECT * FROM `users` WHERE `username`= '{user}'")
         check_token = cursor.fetchone()
 
-
-    print(check_token)
+    print(f"%%%%%%%%%%%%%%%%%%%%%{check_token}")
+    post=check_token
+    author=check_token
+    # print(check_token)
 
     # id = post['_id']
 
@@ -1622,7 +1668,7 @@ def post(post_id):
 
     
 
-    return render_template('public/post.html',post=check_token,author=check_token[0][1])
+    return render_template('public/post.html',post=post,author=author)
 
 
 
