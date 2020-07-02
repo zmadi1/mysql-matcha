@@ -170,63 +170,37 @@ def user_update(form):
 
 def user_login(form):
 
-    # email = form.email.data 
     username = form.username.data
-    # firstname = form.firstname.data
-    # lastname = form.lastname.data
     password =form.password.data 
-    # bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
     try:
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
             
-            # with sqlmgr(user='root',pwd='',db='Matcha') as cnx:
-            # cursor=cnx.cursor()
-            # cursor.execute('USE Matcha')
-            # cursor.execute(find_username(username))
-            
             cursor.execute(find_username(username))
             user = cursor.fetchone()
+            
             cursor.execute(find_password(username))
             passwd = cursor.fetchone()
+            
             cursor.execute(find_registered(username))
             registered = cursor.fetchone()
+            
             cursor.execute(find_user_id(username))
             user_id = cursor.fetchone()
             
-            # print(user[0])
-            # print(passwd[0])
-            # print(registered[0])
-            # print(bcrypt.check_password_hash(passwd[0] ,password))
             if user[0] == username:
                 if bcrypt.check_password_hash(passwd[0] ,password) == True:
-                    # print('*****************************it did work!!!!!!!!!!!!!!!!!!!!')
-                    
-                    
-                    # print(existing_user['username'])
-                    # print(existing_user['_id'])
-                    
-                    # print('*****************************it did work!!!!!!!!!!!!!!!!!!!!')
                     session["USER"] = str(user_id[0])
-                    # print(user_id)
-                    # print(type(session["USER"]))
-                    # session["USERNAME"]=username
-                    # print(session.get('USER'))
-                    
-                    # print('*****************************it did work!!!!!!!!!!!!!!!!!!!!')
-                    # print(registered[0])
+
                     if registered[0] == 1:
-                        # print('Did you see this!!!!!!!!')
                         return  True
                     else:
-                        # print('*****************************it did not work!!!!!!!!!!!!!!!!!!!!')
+                        flash('The Username or Password field is incorrect','danger')
                         return False
                 else:
-                    flash('Please check your password or email and try again','danger')
                     return redirect(request.url)           
             else:
-                flash('Sorry the user doesnt\'t exist please try again','danger')
                 return redirect(request.url)
         # cnx.commit()
         cursor.close()

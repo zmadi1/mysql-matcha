@@ -1080,22 +1080,16 @@ def login():
     form=LoginForm()
     if request.method== 'POST':
         try:
-            if form.validate_on_submit():
-                # print(f'is this what we reruned {user_login(form)}')
-                if user_login(form) == True:
-                    # print('what is wrong kanti???????')
-                    flash('You have logged in ','success')
-                    return redirect(url_for('profile'))
-                elif user_login(form) == False:
-                    return redirect(url_for('update'))
-                else:
-                    print("We have tried it was not enough i guess ")
-                    flash('The user doesn\'t exist','danger')         
+            if user_login(form) == True:
+                flash('You have logged in ','success')
+                return redirect(url_for('profile'))
+            elif user_login(form) == False:
+                return redirect(url_for('update'))
             else:
-                flash('Sorry the user doesnt\'t exist please try again','danger')
+                flash('The Username or Password field is incorrect','danger')
                 return redirect(request.url)
         except TypeError:
-            flash("The user doesn't exist",'danger')
+            flash("The Username or Password field is incorrect",'danger')
             return redirect(request.url)         
     else:
         return render_template('public/login.html',form=form)
