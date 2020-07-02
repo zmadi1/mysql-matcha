@@ -587,7 +587,47 @@ def handle_my_custom_event(data):
     if you_liked !=[]:
         for i in you_liked:
             if i[1] != other_user[0][0]:
+                if i[3] != data['id']:
+
             
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['id']}','{data['time']}')")
+
+                        cnx.commit()
+
+
+
+
+                    #Recording that i have liked someone
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        cursor.execute(f"INSERT INTO `liked`(`liked_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{liked_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{other_user[0][1]}'), '{user[0][1]}','{data['id']}','{data['time']}')")
+
+                        cnx.commit()
+                
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        cursor.execute(f"SELECT COUNT(*) FROM `liked` WHERE user_id ='{other_user[0][0]}'")
+
+                        old_user=cursor.fetchall()
+                        cnx.commit()
+        
+                    print(old_user[0][0])
+                    print(other_username)
+                    # updating notification that someone has liked my profile
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        # UPDATE users SET `age` = '{age}' WHERE `username`='{username}'
+                        cursor.execute(f"UPDATE  `users` SET `notification`='{old_user[0][0]}'  WHERE username='{data['user']}'")
+                        cnx.commit()
+
+
+                    # print(f"This is where the ids are not the same")
+                    # print("What just happend????????????????????????????")
+                    socketio.emit('notification',data,room=other_user[0][1])
+        else:
+            if i[3] != data['id']:
                 with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                     cursor=cnx.cursor()
                     cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['id']}','{data['time']}')")
@@ -621,12 +661,15 @@ def handle_my_custom_event(data):
                     cnx.commit()
 
 
-                print(f"This is the room {other_user[0][1]}")
+                # print(f"This is where the ids are not the same.")
+                
                 socketio.emit('notification',data,room=other_user[0][1])
-        else:
-            flash("You can't like the same user for more than one",'danger')
-            print("You can't like the same user for more than one")
+            else:
+                print("This is where we are")
+                print("The id's are the same.")
+             
     else:
+        # print("What just happend????????????????????????????")
         with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
             cursor=cnx.cursor()
             cursor.execute(f"INSERT INTO `likes`(`likes_id`,`user_id`,`username`,`status`,`epoch`) VALUES('{likes_id}' , (SELECT `user_id` FROM `users` WHERE `username`='{user[0][1]}'), '{other_user[0][1]}','{data['id']}','{data['time']}')")
