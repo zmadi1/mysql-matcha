@@ -1379,6 +1379,12 @@ def gen_male():
     if session.get('USER',None) is not None:
 
         id=session.get("USER")
+
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+                
+            cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+            existing_user = cursor.fetchone()
         
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
@@ -1435,7 +1441,7 @@ def gen_male():
                             users.append(pic[1])
                             posts.append(picture[0])
 
-    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,notification_numb=existing_user[-1],posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
 
 @app.route('/gen_female',methods=['GET','POST'])
 @is_logged_in
@@ -1444,6 +1450,12 @@ def gen_female():
     if session.get('USER',None) is not None:
 
         id=session.get("USER")
+
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+                
+            cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+            existing_user = cursor.fetchone()
         
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
@@ -1500,7 +1512,7 @@ def gen_female():
                             users.append(pic[1])
                             posts.append(picture[0])
 
-    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
 
 @app.route('/gen_bi',methods=['GET','POST'])
 @is_logged_in
@@ -1509,6 +1521,12 @@ def gen_bi():
     if session.get('USER',None) is not None:
 
         id=session.get("USER")
+
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+                
+            cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+            existing_user = cursor.fetchone()
         
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
@@ -1565,7 +1583,7 @@ def gen_bi():
                             users.append(pic[1])
                             posts.append(picture[0])
 
-    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
 
 @app.route('/gen_all',methods=['GET','POST'])
 @is_logged_in
@@ -1574,6 +1592,12 @@ def gen_all():
     if session.get('USER',None) is not None:
 
         id=session.get("USER")
+
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+                
+            cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+            existing_user = cursor.fetchone()
         
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
@@ -1630,7 +1654,7 @@ def gen_all():
                             users.append(pic[1])
                             posts.append(picture[0])
 
-    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
 
 @app.route("/logout")
 @is_logged_in
