@@ -454,8 +454,8 @@ def handle_event(data):
     message_id =secrets.token_urlsafe()
     if data is not None:
         messages = data
-        print(data['room'])
-        print(messages)
+        # print(data['room'])
+        # print(messages)
         if messages != {}:
 
             with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
@@ -551,8 +551,8 @@ def handle_my_custom_event(data):
         old_user=cursor.fetchall()
         cnx.commit()
         
-    print(old_user[0][0])
-    print(other_username)
+    # print(old_user[0][0])
+    # print(other_username)
     # updating notification that someone has liked my profile
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor=cnx.cursor()
@@ -1090,14 +1090,16 @@ def profile():
                 # print(len(name['liked']))
                 # print(existing_user[11])
                 # print(pic[10])
+                
+                # gender
                 if existing_user[11] == pic[10]:
-                    for i in users_i:
-                        for k in user_k:
+                    for i in users_i:#other user interest
+                        for k in user_k:#current user interest
                             if i == k:
                                 with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
                                     cursor=cnx.cursor()
                                     
-                                    cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")
+                                    cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")#other user pic
                                     
                                     picture = cursor.fetchall()
                                     
@@ -1111,8 +1113,8 @@ def profile():
                                     print(picture)
                                     # if pic[0] == 
                                     if picture != []:
-                                        users.append(pic[1])
-                                        posts.append(picture[0])
+                                        users.append(pic[1])#
+                                        posts.append(picture[0])#
             # with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                 # cursor=cnx.cursor()
                 print(existing_user[-2])
@@ -1148,7 +1150,265 @@ def profile():
         # print("Userename not found in session")
         # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
 
+@app.route('/gen_male',methods=['GET','POST'])
+@is_logged_in
+def gen_male():
 
+    if session.get('USER',None) is not None:
+
+        id=session.get("USER")
+        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+            
+            cursor.execute(find_user_by_id(id))
+            username = cursor.fetchone()
+            
+            cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{id}'")
+            profile_pic = cursor.fetchall()
+            
+            cnx.close()
+
+        # print(profile_pic)        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()    
+            cursor.execute("SELECT * FROM users")
+            all_user = cursor.fetchall()
+            # print(all_user)
+        if profile_pic ==[]:
+            profile = "user.png"
+        else:
+            profile = profile_pic[0][0]
+        
+        users = []
+        posts = []
+        interest = []
+        inter = []
+        interest_return =[]
+
+        for pic in all_user:
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+                
+                cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+                existing_user = cursor.fetchone()
+ 
+            if pic[1] != existing_user[1]:
+                if pic[10] == 'Male':
+
+                    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                        cursor=cnx.cursor()
+                                    
+                        cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")
+                               
+                        picture = cursor.fetchall()
+                                    
+                    if pic[1] in users:
+                        continue
+                    else:
+                                    # print(pic[0])
+                        print('-----------------------')
+
+                        if picture != []:
+                            users.append(pic[1])
+                            posts.append(picture[0])
+
+    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+
+@app.route('/gen_female',methods=['GET','POST'])
+@is_logged_in
+def gen_female():
+
+    if session.get('USER',None) is not None:
+
+        id=session.get("USER")
+        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+            
+            cursor.execute(find_user_by_id(id))
+            username = cursor.fetchone()
+            
+            cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{id}'")
+            profile_pic = cursor.fetchall()
+            
+            cnx.close()
+
+        # print(profile_pic)        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()    
+            cursor.execute("SELECT * FROM users")
+            all_user = cursor.fetchall()
+            # print(all_user)
+        if profile_pic ==[]:
+            profile = "user.png"
+        else:
+            profile = profile_pic[0][0]
+        
+        users = []
+        posts = []
+        interest = []
+        inter = []
+        interest_return =[]
+
+        for pic in all_user:
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+                
+                cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+                existing_user = cursor.fetchone()
+ 
+            if pic[1] != existing_user[1]:
+                if pic[10] == 'Female':
+
+                    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                        cursor=cnx.cursor()
+                                    
+                        cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")
+                               
+                        picture = cursor.fetchall()
+                                    
+                    if pic[1] in users:
+                        continue
+                    else:
+                                    # print(pic[0])
+                        print('-----------------------')
+
+                        if picture != []:
+                            users.append(pic[1])
+                            posts.append(picture[0])
+
+    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+
+@app.route('/gen_bi',methods=['GET','POST'])
+@is_logged_in
+def gen_bi():
+
+    if session.get('USER',None) is not None:
+
+        id=session.get("USER")
+        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+            
+            cursor.execute(find_user_by_id(id))
+            username = cursor.fetchone()
+            
+            cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{id}'")
+            profile_pic = cursor.fetchall()
+            
+            cnx.close()
+
+        # print(profile_pic)        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()    
+            cursor.execute("SELECT * FROM users")
+            all_user = cursor.fetchall()
+            # print(all_user)
+        if profile_pic ==[]:
+            profile = "user.png"
+        else:
+            profile = profile_pic[0][0]
+        
+        users = []
+        posts = []
+        interest = []
+        inter = []
+        interest_return =[]
+
+        for pic in all_user:
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+                
+                cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+                existing_user = cursor.fetchone()
+ 
+            if pic[1] != existing_user[1]:
+                if pic[10] == 'Bisexual':
+
+                    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                        cursor=cnx.cursor()
+                                    
+                        cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")
+                               
+                        picture = cursor.fetchall()
+                                    
+                    if pic[1] in users:
+                        continue
+                    else:
+                                    # print(pic[0])
+                        print('-----------------------')
+
+                        if picture != []:
+                            users.append(pic[1])
+                            posts.append(picture[0])
+
+    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+
+@app.route('/gen_all',methods=['GET','POST'])
+@is_logged_in
+def gen_all():
+
+    if session.get('USER',None) is not None:
+
+        id=session.get("USER")
+        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+            
+            cursor.execute(find_user_by_id(id))
+            username = cursor.fetchone()
+            
+            cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{id}'")
+            profile_pic = cursor.fetchall()
+            
+            cnx.close()
+
+        # print(profile_pic)        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()    
+            cursor.execute("SELECT * FROM users")
+            all_user = cursor.fetchall()
+            # print(all_user)
+        if profile_pic ==[]:
+            profile = "user.png"
+        else:
+            profile = profile_pic[0][0]
+        
+        users = []
+        posts = []
+        interest = []
+        inter = []
+        interest_return =[]
+
+        for pic in all_user:
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+                
+                cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+                existing_user = cursor.fetchone()
+ 
+            if pic[1] != existing_user[1]:
+                # if pic[10] == 'Bisexual':
+
+                    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                        cursor=cnx.cursor()
+                                    
+                        cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")
+                               
+                        picture = cursor.fetchall()
+                                    
+                    if pic[1] in users:
+                        continue
+                    else:
+                                    # print(pic[0])
+                        print('-----------------------')
+
+                        if picture != []:
+                            users.append(pic[1])
+                            posts.append(picture[0])
+
+    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
 
 @app.route("/logout")
 @is_logged_in
