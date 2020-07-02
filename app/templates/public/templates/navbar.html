@@ -20,7 +20,7 @@
             
           </button>
         </a>
-        
+      {% endif %}      
       </div>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -28,7 +28,6 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         
         <a class="navbar-brand" href="{{ url_for('profile')}}">HOME</a>
-<<<<<<< HEAD
         <!-- <div class="container my-4"> -->
             
         <div class="dropdown">
@@ -74,8 +73,6 @@
     {% if  isHere%}
       <p></p>
     {% else %}
-=======
->>>>>>> e425e9846d3a844170c45fb46b6ad59f5f3f5ddf
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
         <a class="nav-link" href="{{ url_for('account') }}">UPDATE-ACCOUNT</a>
@@ -86,7 +83,6 @@
     <!-- <li class="nav-item">
       <a class="nav-link" >LOGIN</a>
       </li> -->
-<<<<<<< HEAD
       <!-- SMS Notification -->
       {% if  isUpdate%}
         <p></p>
@@ -105,16 +101,9 @@
         <!-- <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a> -->
         <!-- <div class="dropdown-menu" aria-labelledby="navbarDropdown"> -->
         <!-- </div> -->
-=======
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a>
-        </div>
->>>>>>> e425e9846d3a844170c45fb46b6ad59f5f3f5ddf
       </li>
     </ul>
     </nav>
 
-    {% endblock %}
+  {% endblock %}
     

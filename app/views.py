@@ -521,7 +521,7 @@ def handle_event(data):
                     user_id VARCHAR(200) NOT NULL,
                     message TEXT NOT NULL,
                     username VARCHAR(100) NOT NULL,
-                    epoch VARCHAR(250) NOT NULL,  
+                    epoch VARCHAR(250/log) NOT NULL,  
                     PRIMARY KEY(message_id),
                     FOREIGN KEY(user_id) REFERENCES `users`(user_id)
                 )""")
