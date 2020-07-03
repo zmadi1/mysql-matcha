@@ -22,6 +22,16 @@ import time
 from time import localtime,strftime
 
 from itsdangerous import SignatureExpired, URLSafeTimedSerializer
+import re 
+  
+# Regular expression for validating an Email 
+mail_regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+# for custom mails use: '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$'
+
+username_regex = '\w' # fuck me sideways equivalent is '[a-zA-Z0-9_]'
+firstname_regex = '[a-zA-Z]+'
+passwd_regex = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$'
+interest_regex = '^#'
 
 # bcrypt = Bcrypt(app)
 mail = Mail(app)
@@ -980,40 +990,114 @@ def query():
 
 
 # ?foo=foo&bar=bar&baz=baz&title=query+strings+with+flask
+def check_mail(email):  
+    if(re.search(mail_regex,email)):  
+        return True           
+    else:  
+        return False
+
+def check_username(username):  
+    if(re.search(username_regex,username)):
+        if len(username) > 1:
+            if len(username) < 31:   
+                return True  
+    else:  
+        return False
+
+def check_first_last_name(firstname):  
+    if(re.search(firstname_regex,firstname)):
+        if len(firstname) > 1:
+            if len(firstname) < 31:   
+                return True  
+    else:  
+        return False
+
+def check_passwd(passwd): 
+    pat = re.compile(passwd_regex)       
+    mat = re.search(pat, passwd)  
+    if mat: 
+        return True 
+    else: 
+        return False 
+
+def check_interest(interest):  
+    if(re.search(interest_regex,interest)):  
+        return True           
+    else:  
+        return False
+
+def check_bio(bio):  
+    if(re.search(firstname_regex,bio)):
+        if len(bio) > 3:
+            if len(bio) < 401:   
+                return True  
+    else:  
+        return False
+
+def check_gender(gender):  
+        if gender == 'Male':
+            return True
+        elif gender == 'Female':   
+            return True
+        elif gender == 'Other':  
+            return True
+        else:  
+            return False
+
+def check_sexualP(sexualPreference):
+        if sexualPreference == 'Male':
+            return True
+        elif sexualPreference == 'Female':   
+            return True
+        elif sexualPreference == 'Bisexual':  
+            return True
+        else:  
+            return False
 
 @app.route('/registration',methods=['POST','GET'])
 def registration():
     form=RegistrationForm()
 
     if request.method =='POST':
-        create_users(form)
         email = form.email.data
+        username = form.username.data
+        firstname = form.firstname.data
+        lastname = form.lastname.data
+        password = form.password.data
+        confirm_password = form.confirm_password.data
 
-        # print(session.get("token"))
-        # print(token)
-        # print('Hellooooooooooooo')
-        # print(token)
-        # for key in request.session.keys():
-        #     print("key:=>" + request.session[key])
-
-        print('hello')
-        token = session.get("TOKEN")
-        print("Here")
-        msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
+        if check_username(username):
+            if check_first_last_name(firstname):
+                if check_first_last_name(lastname):
+                    if check_mail(email):
+                        if check_passwd(password):
+                            if confirm_password == password:
+                                if create_users(form):
+                                    token = session.get("TOKEN")
+                                    msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
         
-        link  = url_for('confirm_email',token=token, _external=True)
+                                    link  = url_for('confirm_email',token=token, _external=True)
         
-        msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
+                                    msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
 
-        mail.send(msg)
-        #    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        # cursor=cnx.cursor()
-    
-        # cursor.execute(f"SELECT COUNT(`picture`) FROM `pictures` WHERE `user_id`='{id}'")
-        # picture = cursor.fetchone()
-    
+                                    mail.send(msg)
 
-        return redirect(url_for('login'))
+                                    return redirect(url_for('login'))
+                            else:
+                                flash('The two passwords provided do not match, please try again.', 'danger')
+                        else:
+                            flash('The password field should have at least one number', 'danger')
+                            flash('At least one uppercase and one lowercase character', 'danger')
+                            flash('At least one special symbol and be between 6 to 20 characters long', 'danger')
+                            flash('Be between 6 to 20 characters long, please try again', 'danger')
+                    else:
+                        flash('The email address is invalid, please try again','danger')
+                else:
+                    flash('The lastname field must be between 2 to 30 characters long and can only contain English alphabet characters, please try again', 'danger')
+            else:
+                flash('The firstname field must be between 2 to 30 characters long and can only contain English alphabet characters, please try again', 'danger')    
+        else:
+            flash('The username field must be between 2 to 30 characters long and can be AlphaNumeric, please try again', 'danger')                     
     return render_template('public/registration.html',form=form,title='SignUp')
 
 
@@ -1086,7 +1170,6 @@ def login():
             elif user_login(form) == False:
                 return redirect(url_for('update'))
             else:
-                flash('The Username or Password field is incorrect','danger')
                 return redirect(request.url)
         except TypeError:
             flash("The Username or Password field is incorrect",'danger')
@@ -1671,16 +1754,52 @@ def logout():
 @is_logged_in
 def update():
     form = UpdateAccountForm()
-       
     
+    interest = form.interest.data 
+    age = form.age.data
+    bio = form.bio.data
+    gender = form.gender.data
+    sexualPreference =form.sexualPreference.data
+
     if request.method == 'POST':
-        if user_update(form) == True:
-            if form.picture.data:
-                picture_file = save_picture(form.picture.data)
-                return redirect(url_for('profile'))
+        if(str(age).isdigit()):
+            if age >= 21:
+                if age <= 85:
+                    if check_interest(interest):
+                        if check_bio(bio):
+                            if check_gender(gender):
+                                if check_sexualP(sexualPreference):
+                                    if user_update(form) == True:
+                                        if form.picture.data:
+                                            picture_file = save_picture(form.picture.data)
+                                            return redirect(url_for('profile'))
+                                        else:
+                                            flash('You need to upload a profile picture', 'danger')
+                                            return render_template('public/update_profile.html',form=form, isUpdate=True)
+                                    else:
+                                        flash('Something went wrong.' 'danger')
+                                        return render_template('public/update_profile.html',form=form, isUpdate=True)
+                                else:
+                                    flash('Sexual preference selection is incorrect.', 'danger')
+                                    return render_template('public/update_profile.html',form=form, isUpdate=True)        
+                            else:
+                                flash('Gender selection is incorrect.', 'danger')
+                                return render_template('public/update_profile.html',form=form, isUpdate=True)
+                        else:
+                            flash('Your biography needs to be a minimum of four characters long, please try again.', 'danger')
+                            return render_template('public/update_profile.html',form=form, isUpdate=True)
+                    else:
+                        flash('You need begin your interests with # (Hashtag)', 'danger')
+                        return render_template('public/update_profile.html',form=form, isUpdate=True)
+                else:
+                    flash('You are too old, please try again in your next lifetime.', 'danger')
+                    return render_template('public/update_profile.html',form=form, isUpdate=True)    
+            else:
+                flash('You are too young, please try again in the near future.', 'danger')
+                return render_template('public/update_profile.html',form=form, isUpdate=True)
         else:
-            redirect(request.url)
-  
+            flash('Age needs to be a valid number between 21 and 85 years, please try again', 'danger')
+            return render_template('public/update_profile.html',form=form, isUpdate=True)
     else:
         return render_template('public/update_profile.html',form=form, isUpdate=True)
 
@@ -1797,6 +1916,13 @@ def account():
     form=UploadsForm()
 
     id=session.get("USER")
+    username = form.username.data
+    email = form.email.data
+    interest = form.interest.data 
+    age = form.age.data
+    bio = form.bio.data
+    gender = form.gender.data
+    sexualPreference = form.sexualPreference.data
 
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         cursor=cnx.cursor()
@@ -1813,21 +1939,41 @@ def account():
         existing_user = cursor.fetchone()
 
     if request.method == 'POST':
-
-        if form.username.data:
+        
+        if check_username(username):
             upd_username(form)
-        if form.email.data:
+        else:
+            flash('The username field must be between 2 to 30 characters long and can be AlphaNumeric, please try again', 'danger')
+        if check_mail(email):
             upd_email(form)
-        if form.age.data:
-            upd_age(form)
-        if form.interest.data:
+        else:
+            flash('The email address is invalid, please try again','danger')
+        if str(age).isdigit():
+            if age >= 21:
+                if age <= 85:
+                    upd_age(form)
+                else:
+                    flash('You are too old, please try again in your next lifetime.', 'danger')
+            else:
+                flash('You are too young, please try again in the near future.', 'danger')    
+        else:
+            flash('Age needs to be a valid number between 21 and 85 years, please try again', 'danger')    
+        if check_interest(interest):
             upd_interest(form)
-        if form.bio.data:
+        else:
+            flash('You need begin your interests with # (Hashtag)', 'danger')
+        if check_bio(bio):
             upd_bio(form)
-        if form.gender.data:
+        else:
+            flash('Your biography needs to be a minimum of four characters long, please try again.', 'danger')
+        if check_gender(gender):
             upd_gender(form)
-        if form.sexualPreference.data:
+        else:
+            flash('Gender selection is incorrect.', 'danger')
+        if check_sexualP(sexualPreference):
             upd_sexual(form)
+        else:
+            flash('Sexual preference selection is incorrect.', 'danger')
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
         

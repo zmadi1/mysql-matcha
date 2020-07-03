@@ -156,7 +156,6 @@ def user_update(form):
                 if form.validate_on_submit():
                     cursor.execute(f"UPDATE users SET `age` = '{age}' WHERE `username`='{username[0]}'")
                     cursor.execute(f"UPDATE users SET `bio` = '{bio}' WHERE `username`='{username[0]}'")
-                    # cursor.execute(f"UPDATE users SET `gender` = '{gender}' WHERE `username`='{username[0]}'")
                     cursor.execute(f"UPDATE users SET `sexualPreference` = '{sexualPreference}' WHERE `username`='{username[0]}'")
                     cursor.execute(f"UPDATE users SET `gender` = '{gender}' WHERE `username`='{username[0]}'")
                     cursor.execute(f"UPDATE users SET `Interest` = '{interest}' WHERE `username`='{username[0]}'")
@@ -196,7 +195,6 @@ def user_login(form):
                     if registered[0] == 1:
                         return  True
                     else:
-                        flash('The Username or Password field is incorrect','danger')
                         return False
                 else:
                     return redirect(request.url)           
@@ -244,9 +242,9 @@ def create_users(form):
            """CREATE TABLE IF NOT EXISTS `users` 
             (
             user_id VARCHAR(200) NOT NULL,
-            username VARCHAR(20) NOT NULL UNIQUE,
-            firstname VARCHAR(20) NOT NULL,
-            lastname VARCHAR(20) NOT NULL,
+            username VARCHAR(30) NOT NULL UNIQUE,
+            firstname VARCHAR(30) NOT NULL,
+            lastname VARCHAR(30) NOT NULL,
             email VARCHAR(100) NOT NULL UNIQUE,
             password TEXT NOT NULL,
             age INT,
@@ -348,7 +346,6 @@ def create_users(form):
             if user_number[0] != 1:
                 
                 if email_number[0] != 1:
-
                     print(session.get("TOKEN"))
                     cursor.execute(
                     f"""INSERT INTO  
@@ -357,10 +354,10 @@ def create_users(form):
                     cnx.commit()
                     return True
                 else:
-                    flash('The email have been taken,please try a different one','danger')
+                    flash('The email has already been taken, please try a different one.','danger')
                     return False
             else:
-                flash('The username have been taken,please try a different one','danger')
+                flash('The username has already been taken, please try a different one.','danger')
         except:
             pass
             # flash('The username or the email have been taken,please try a different one','danger')
