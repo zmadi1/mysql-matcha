@@ -65,8 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.message_holder').scrollTop = document.querySelector('.message_holder').scrollHeight;
     })
 
-<<<<<<< HEAD
-=======
     // open-profile
     socket.on('open-profile', msg => {
         console.log(msg)
@@ -79,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // document.querySelector('.message_holder').scrollTop = document.querySelector('.message_holder').scrollHeight;
     })
 
->>>>>>> 275438f61aaf0859e028f4a2c82507bb46548309
 
     //Room selection
     document.querySelectorAll('.select-room').forEach(p => {
