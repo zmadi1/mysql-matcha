@@ -21,13 +21,11 @@
               <textarea class="form-control" id="bio" cols="30" rows="3" placeholder="Enter your biography"></textarea>
           </div>
           <div class="form-group">
+              <p>{{users}}</p>
               {% for posts in users %}
-              <p><b>{{  posts.username }}</p></b>
-              <b><p>{{ posts.age }}</p></b>
-              <a href="{{ url_for('post',post_id=posts.username) }}" id="{{ posts.username }}" class="link" ><img  id="profle" class="rounded-circle " src="{{ url_for('static',filename='img/'+posts.profile_pic)}}" alt="" height="100" width="100" class="img-fluid img-thumbnail"></a>
-              <!-- <button type="button" class="btn btn-danger"><i  name="{{ posts.username }}" id="like"  type="button" class="btn btn-danger" class="fa fa-times"></i> </button> -->
-              <button name="{{ posts.username }}" value="{{ existing_user.username }}" id="like"  type="button" class="btn btn-success"><i class="fa fa-heart"></i></button>
-              <button type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
+              <p><b>{{  posts }}</p></b>
+              <b><p>al;dkja;lkda</p></b>
+         
               {% endfor %}
               <input type="range" name="rangeInput" min="0" max="100" onchange="updateTextInput(this.value);">
               <input type="text" id="textInput" value="">

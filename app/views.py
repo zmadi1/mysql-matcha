@@ -985,6 +985,8 @@ def query():
 def registration():
     form=RegistrationForm()
 
+
+    
     if request.method =='POST':
         create_users(form)
         email = form.email.data
@@ -1006,6 +1008,8 @@ def registration():
         msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
 
         mail.send(msg)
+
+        
         #    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         # cursor=cnx.cursor()
     
@@ -1368,7 +1372,7 @@ def profile():
             # response = make_response(jsonify(req))
             # return response
 
-    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html', interest_return= interest_return,notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
     # else:
         # print("Userename not found in session")
         # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
@@ -1671,7 +1675,18 @@ def logout():
 @is_logged_in
 def update():
     form = UpdateAccountForm()
-       
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM `users`")
+        items = cursor.fetchall()
+    
+    arr = []
+    for i in items:
+        if i[13] is not None:
+            arr.append(i[13])
+
+    print(arr)   
     
     if request.method == 'POST':
         if user_update(form) == True:
@@ -1682,7 +1697,7 @@ def update():
             redirect(request.url)
   
     else:
-        return render_template('public/update_profile.html',form=form, isUpdate=True)
+        return render_template('public/update_profile.html',arr=arr,form=form, isUpdate=True)
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
@@ -1931,28 +1946,76 @@ def hash_tag(post_id):
     tags = post_id
     tag = request.url
     
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`='{id}'")
+        existing_user = cursor.fetchone()
 
-    existing_user = find_id(id)
-    liked = existing_user['liked']
+    # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+    #     cursor=cnx.cursor()
+    #     cursor.execute(f"SELECT * FROM `users` WHERE `Interest`='#{post_id}'")
+    #     hasing = cursor.fetchone()
 
-    liked_number = len(liked)
-    all_existing_blog_post = all_existing_post()
-    all_existing_user = all_existing_users()
+    # print(f"This is the value{hasing}")
+
+
+    
+    # print(existing_user)
+    liked = existing_user[-2]
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM `users`")
+        all_existing_user = cursor.fetchall()
+
+    
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor=cnx.cursor()
+        cursor.execute(f"SELECT * FROM `pictures`")
+        all_existing_blog_post = cursor.fetchall()
+
+
+    # liked_number = len(liked)
+    # all_existing_blog_post
+    # all_existing_user = all_existing_users()
     users = []
+    pic=[]
  
    
     
+    user_k = existing_user[13].split(',')
     for name in all_existing_user:
+        # print(name[1])
+        # print(existing_user[1])
           
-        users_i = name['Interest'][0].split(',')
-        user_k = existing_user['Interest'][0].split(',')
+        users_i = name[13].split(',')
+        for i in users_i:
+            pic.append(i)
 
-        if name['username'] != existing_user['username']:
-            for i in users_i:
-            
-                if i == tags:
-                    if name in users:
-                        continue
-                    else:
-                        users.append(name)
+        # if name[1] != existing_user[1]:
+        #     # print(name[1])
+        #   )
+
+    for k in pic:
+        if k == tags:
+            print(k)
+    
+    # print(pic)
+    #             #     if name in users:
+    #             #         continue
+    #             #     else:
+    #             #         print(name)
+    #             #         users.append(name)
+    #             #         # print(name)
+
+    # print(users)
+    
+    # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        # cursor=cnx.cursor()
+        # cursor.execute(f"SELECT * FROM `pictures` WHERE `user_id`='{id}'")
+        # ps = cursor.fetchall()
+    # for i in users:
+        # print(ps)
+        
+
     return render_template('public/landing_page.html',users=users,existing_user=existing_user)

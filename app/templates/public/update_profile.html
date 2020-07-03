@@ -8,6 +8,7 @@
 {% block notify %}{% endblock %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static',filename='css/tag.css')}}">
 
 <div class="container">
   
@@ -36,16 +37,22 @@
        <div></div>
 
         {{ form.interest.label(class='form-control-label')}}
-        {%if form.interest.errors %}
-        <div class="invalid-feedback">
-          {{ form.interest(class="form-control form-control-lg is-invalid")}}
-          {% for error in form.bio.errors %}
-          <span>{{ error }}</span>
-          {% endfor %}
-        </div>
-        {% else %}
-        {{ form.interest(class="form-control form-control-lg", id="tag", data_role="tagsinput", type="text")}}
-        {% endif %}
+        <p>
+          <div id="enter" class="tags-input" data-name="tags-input">
+             
+          </div>
+          <script src="{{ url_for('static',filename='js/tag.js')}}"></script>
+      </p>
+      {% for i in arr %}
+      <p>{{i}}</p>
+      {% endfor %}
+      
+      <datalist  id="languageList">
+        {% for i in arr %}
+        <option value="{{i}}" />
+        {% endfor %}
+ 
+      </datalist>
         <br>
         {{ form.bio.label(class='form-control-label')}}
         {%if form.bio.errors %}

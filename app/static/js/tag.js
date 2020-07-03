@@ -7,7 +7,9 @@
     hiddenInput.setAttribute('name', el.getAttribute('data-name'));
 
     mainInput.setAttribute('type', 'text');
+    mainInput.setAttribute('id','main');
     mainInput.classList.add('main-input');
+    mainInput.setAttribute('list','languageList');
     mainInput.addEventListener('input', function () {
         let enteredTags = mainInput.value.split(',');
         if (enteredTags.length > 1) {
