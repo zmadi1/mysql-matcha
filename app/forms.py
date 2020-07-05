@@ -21,8 +21,6 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
-
-
 class ForgotForm(FlaskForm):
     
     email = StringField('Email')
@@ -34,8 +32,8 @@ class UpdateAccountForm(FlaskForm):
     gender = RadioField('Gender', choices=[('Male','Male'),('Female','Female'),('Bisexual','Other')])
     sexualPreference = RadioField('SexualPreference',choices=[('Male','Male'),('Female','Female'),('Bisexual','Bisexual')])
     bio = TextAreaField('Biography')
-    interest = StringField('Interest')
-    picture = FileField('Upload picture',validators=[FileAllowed(['jpg','png','jpeg'])])
+    interest = StringField('Interest', id='autocomplete')
+    picture = FileField('Upload picture')
     submit = SubmitField('Update')
 
 class UploadsForm(FlaskForm):
@@ -48,7 +46,7 @@ class UploadsForm(FlaskForm):
     sexualPreference = RadioField('SexualPreference',choices=[('Male','Male'),('Female','Female'),('Bisexual','Bisexual')])
     bio = TextAreaField('Biography')
     interest = StringField('Interest')
-    picture = FileField('Upload picture',validators=[FileAllowed(['jpg','png','jpeg'])])
+    picture = FileField('Upload picture')
     submit = SubmitField('Update')
 
 

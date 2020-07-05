@@ -24,7 +24,6 @@ from time import localtime,strftime
 from itsdangerous import SignatureExpired, URLSafeTimedSerializer
 import re 
   
-# Regular expression for validating an Email 
 mail_regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 # for custom mails use: '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$'
 
@@ -47,16 +46,16 @@ ROOMS = ["lounge","news","games","coding"]
 
 
 
-@app.route('/identity')
-def identity():
-    id=session.get("USER") 
-    # existing_blog_post = find_blog_post(id_)
-    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        cursor=cnx.cursor()
+# @app.route('/identity')
+# def identity():
+#     id=session.get("USER") 
+#     # existing_blog_post = find_blog_post(id_)
+#     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+#         cursor=cnx.cursor()
             
-        cursor.execute(find_user_by_id(id))
-        existing_user = cursor.fetchone()
-    return()
+#         cursor.execute(find_user_by_id(id))
+#         existing_user = cursor.fetchone()
+#     return()
 
 # Check if user logged in
 def is_logged_in(f):
@@ -69,6 +68,15 @@ def is_logged_in(f):
             return redirect(url_for('login'))
     return wrap
 
+def is_access(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if not 'USER' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized', 'danger')
+            return redirect(url_for('profile'))
+    return wrap
 # app.config['IMAGE_UPLOADS'] = '~/Documents/app/app/static/img'
 # @app.route('/admin')
 # def admin():
@@ -989,7 +997,7 @@ def query():
 
 
 
-# ?foo=foo&bar=bar&baz=baz&title=query+strings+with+flask
+# Validators
 def check_mail(email):  
     if(re.search(mail_regex,email)):  
         return True           
@@ -1054,7 +1062,31 @@ def check_sexualP(sexualPreference):
         else:  
             return False
 
+def check_where():
+
+    id = session["USER"] 
+
+    try:
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+
+            cursor.execute(find_user_by_id(id))
+            username = cursor.fetchone()
+
+            cursor.execute(find_registered(username[0]))
+            registered = cursor.fetchone()
+            print(username)
+            if registered[0] == 1:
+                return  True
+            else:
+                return False
+            
+        cursor.close()
+    except mysql.connector.Error as err:
+        print(err)
+
 @app.route('/registration',methods=['POST','GET'])
+@is_access
 def registration():
     form=RegistrationForm()
 
@@ -1131,6 +1163,7 @@ def confirm_email(token):
     return "success"
 
 @app.route('/forgotpass')
+@is_access
 def forgot_pass():
 
     form = ForgotForm()
@@ -1138,6 +1171,7 @@ def forgot_pass():
     return render_template('public/forgotpass.html',form=form)
 
 @app.route('/reset_passwd', methods=['POST','GET'])
+@is_access
 def reset_passwd():
     form = ForgotForm(request.form)
 
@@ -1159,9 +1193,11 @@ def reset_passwd():
 
 
 @app.route('/',methods=['POST','GET'])
+@is_access
 def login():
     
     form=LoginForm()
+
     if request.method== 'POST':
         try:
             if user_login(form) == True:
@@ -1175,6 +1211,9 @@ def login():
             flash("The Username or Password field is incorrect",'danger')
             return redirect(request.url)         
     else:
+        # if check_where() == True:
+        #     return redirect(url_for('profile'))
+        # else:
         return render_template('public/login.html',form=form)
 
 def allowed_image(filename):
@@ -1290,171 +1329,176 @@ def upload_image():
 def profile():
 
     # print("where am i printing this?")
-    if session.get('USER',None) is not None:
+    try:
+        if check_where() == True:
+            if session.get('USER',None) is not None:
 
-        id=session.get("USER")
-        # existing_user = find_id(id)
-        # existing_blog_post = find_blog_post(id)
-        # flash("This is the profile",'danger')
-        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-            cursor=cnx.cursor()
+                id=session.get("USER")
+                # existing_user = find_id(id)
+                # existing_blog_post = find_blog_post(id)
+                # flash("This is the profile",'danger')
+                with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                    cursor=cnx.cursor()
             
-            cursor.execute(find_user_by_id(id))
-            username = cursor.fetchone()
+                    cursor.execute(find_user_by_id(id))
+                    username = cursor.fetchone()
             
-            cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{id}'")
-            profile_pic = cursor.fetchall()
+                    cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{id}'")
+                    profile_pic = cursor.fetchall()
             
-            cnx.close()
+                    cnx.close()
 
 
-        print(profile_pic)        
-        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-            cursor=cnx.cursor()    
-            cursor.execute("SELECT * FROM users")
-            all_user = cursor.fetchall()
+                print(profile_pic)        
+                with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                    cursor=cnx.cursor()    
+                    cursor.execute("SELECT * FROM users")
+                    all_user = cursor.fetchall()
             
-        # for j in all_user:git merge --abort
-            # print(j[13])
-        if profile_pic ==[]:
-            profile = "user.png"
-        else:
-            profile = profile_pic[0][0]
-        # print(profile_pic[0])
-        # print(user_id[0])
+                # for j in all_user:git merge --abort
+                    # print(j[13])
+                if profile_pic ==[]:
+                    profile = "user.png"
+                else:
+                    profile = profile_pic[0][0]
+                # print(profile_pic[0])
+                # print(user_id[0])
 
-        #checking if there is a new like
-        # liked = existing_user['liked']
+                #checking if there is a new like
+                # liked = existing_user['liked']
 
-        # liked_number = len(liked)
+                # liked_number = len(liked)
 
-        # all_existing_blog_post = all_existing_post()
-        # all_user_post = all_existing_users()
-        users = []
-        posts = []
-        interest = []
-        inter = []
-        interest_return =[]
+                # all_existing_blog_post = all_existing_post()
+                # all_user_post = all_existing_users()
+                users = []
+                posts = []
+                interest = []
+                inter = []
+                interest_return =[]
 
         
 
-        for pic in all_user:
-        #     id = pic['author']
-            # posts.append(pic[0])
-            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-                cursor=cnx.cursor()
+                for pic in all_user:
+                #     id = pic['author']
+                    # posts.append(pic[0])
+                    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                        cursor=cnx.cursor()
                 
-                cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
-                existing_user = cursor.fetchone()
+                        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+                        existing_user = cursor.fetchone()
                 
-            # interest.append(pic[13])
+                    # interest.append(pic[13])
             
-            # print(existing_user[13])
+                    # print(existing_user[13])
 
-            if pic[13] is not None:
-                users_i = pic[13].split(',')
-            # print(users_i)
-            user_k = existing_user[13].split(',')
-            # print(user_k)
-            # print(pic[1])
-            if pic[13] is not None:
-                for k in users_i:
-                    interest_return.append(k)
+                    if pic[13] is not None:
+                        users_i = pic[13].split(',')
+                    # print(users_i)
+                    user_k = existing_user[13].split(',')
+                    # print(user_k)
+                    # print(pic[1])
+                    if pic[13] is not None:
+                        for k in users_i:
+                            interest_return.append(k)
             
            
-            if pic[1] != existing_user[1]:
-                # print(pic[1])
-                # print(len(name['liked']))
-                # print(existing_user[11])
-                # print(pic[10])
+                    if pic[1] != existing_user[1]:
+                        # print(pic[1])
+                        # print(len(name['liked']))
+                        # print(existing_user[11])
+                        # print(pic[10])
                 
-                # gender
-                if existing_user[11] == pic[10]:
-                    for i in users_i:#other user interest
-                        for k in user_k:#current user interest
-                            if i == k:
-                                with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-                                    cursor=cnx.cursor()
+                        # gender
+                        if existing_user[11] == pic[10]:
+                            for i in users_i:#other user interest
+                                for k in user_k:#current user interest
+                                    if i == k:
+                                        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                                            cursor=cnx.cursor()
                                     
-                                    cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")#other user pic
+                                            cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")#other user pic
                                     
-                                    picture = cursor.fetchall()
+                                            picture = cursor.fetchall()
                                     
-                                    # cursor.execute(f"SELECT `user_id` FROM `pictures` WHERE `user_id`= ")
-                                # print(picture[0])
-                                if pic[1] in users:
-                                    continue
-                                else:
-                                    print(pic[0])
-                                    print('-----------------------')
-                                    print(picture)
-                                    # if pic[0] == 
-                                    if picture != []:
-                                        users.append(pic[1])#
-                                        posts.append(picture[0])#
-            # with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-                # cursor=cnx.cursor()
-                print(existing_user[-2])
+                                            # cursor.execute(f"SELECT `user_id` FROM `pictures` WHERE `user_id`= ")
+                                        # print(picture[0])
+                                        if pic[1] in users:
+                                            continue
+                                        else:
+                                            print(pic[0])
+                                            print('-----------------------')
+                                            print(picture)
+                                            # if pic[0] == 
+                                            if picture != []:
+                                                users.append(pic[1])#
+                                                posts.append(picture[0])#
+                    # with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        # cursor=cnx.cursor()
+                        print(existing_user[-2])
         
-        # interest_return = list(dict.fromkeys(interest_return))
-        gis_id =secrets.token_urlsafe()
-        # pagination =users_pagination()
-        # post = []
-        # for i in posts:
-        #     for k in i:
-        #         post.append(k)
+                # interest_return = list(dict.fromkeys(interest_return))
+                gis_id =secrets.token_urlsafe()
+                # pagination =users_pagination()
+                # post = []
+                # for i in posts:
+                #     for k in i:
+                #         post.append(k)
         
-        if request.is_json:
-            req = request.get_json()
+                if request.is_json:
+                    req = request.get_json()
 
-            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-                cursor=cnx.cursor()
-                cursor.execute(
-                """
-                CREATE TABLE IF NOT EXISTS `location`(
-                gis_id VARCHAR(100) ,
-                user_id VARCHAR(200) NOT NULL,
-                location JSON, 
-                PRIMARY KEY(gis_id),
-                FOREIGN KEY(user_id) REFERENCES `users`(user_id)
-                )
-                """
-                )
-                cnx.commit()
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor=cnx.cursor()
+                        cursor.execute(
+                        """
+                        CREATE TABLE IF NOT EXISTS `location`(
+                        gis_id VARCHAR(100) ,
+                        user_id VARCHAR(200) NOT NULL,
+                        location JSON, 
+                        PRIMARY KEY(gis_id),
+                        FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+                        )
+                        """
+                        )
+                        cnx.commit()
 
-            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-                cursor = cnx.cursor()
-                cursor.execute(f"SELECT COUNT(*) FROM `location` WHERE `user_id`='{existing_user[0]}'")
-                length = cursor.fetchall()
+                    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        cursor = cnx.cursor()
+                        cursor.execute(f"SELECT COUNT(*) FROM `location` WHERE `user_id`='{existing_user[0]}'")
+                        length = cursor.fetchall()
 
-            print(req)
-            print(length[0][0])
-            if length[0][0] == 0:
-                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-                    cursor = cnx.cursor()
+                    print(req)
+                    print(length[0][0])
+                    if length[0][0] == 0:
+                        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                            cursor = cnx.cursor()
 
-                    cursor.execute(f"""INSERT INTO `location`(`gis_id`,`user_id`,`location`)  VALUES("{gis_id}","{existing_user[0]}","{req}")""")
-                    cnx.commit()
+                            cursor.execute(f"""INSERT INTO `location`(`gis_id`,`user_id`,`location`)  VALUES("{gis_id}","{existing_user[0]}","{req}")""")
+                            cnx.commit()
 
-            # if len(existing_user['coordinates']) == 0:
-        #         coordinates_update(existing_user,req)
+                 # if len(existing_user['coordinates']) == 0:
+                #         coordinates_update(existing_user,req)
 
-        #     coord =[]
-        #     for post in all_user_post:
-        #         coord.append(post['coordinates'])
+             #     coord =[]
+                #     for post in all_user_post:
+                #         coord.append(post['coordinates'])
 
-        #     okc_ok = (existing_user['coordinates']['lat'], existing_user['coordinates']['long'])
-        #     d = []
-        #     for index in coord:
-        #         norman_ok = (index['lat'], index['long'])
-            #     d.append(distance.distance(okc_ok , norman_ok ).km)
-            # response = make_response(jsonify(req))
-            # return response
+                #     okc_ok = (existing_user['coordinates']['lat'], existing_user['coordinates']['long'])
+                #     d = []
+                #     for index in coord:
+                #         norman_ok = (index['lat'], index['long'])
+                    #     d.append(distance.distance(okc_ok , norman_ok ).km)
+                    # response = make_response(jsonify(req))
+                    # return response
 
-    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
-    # else:
-        # print("Userename not found in session")
-        # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
+            return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+        else:
+            flash("You need to fill in all your information on this page before you are granted access to any page within the app.",'danger')
+            return redirect(url_for('update')) 
+    except:
+        flash("Something went wrong.",'danger')
+        return redirect(url_for('profile'))
 
 @app.route('/gen_male',methods=['GET','POST'])
 @is_logged_in
@@ -1749,7 +1793,6 @@ def logout():
     res.set_cookie('foo', 'bar', max_age=0)
     return redirect(url_for('login'))
 
-
 @app.route('/update',methods=['GET','POST'])
 @is_logged_in
 def update():
@@ -1761,46 +1804,54 @@ def update():
     gender = form.gender.data
     sexualPreference =form.sexualPreference.data
 
-    if request.method == 'POST':
-        if(str(age).isdigit()):
-            if age >= 21:
-                if age <= 85:
-                    if check_interest(interest):
-                        if check_bio(bio):
-                            if check_gender(gender):
-                                if check_sexualP(sexualPreference):
-                                    if user_update(form) == True:
-                                        if form.picture.data:
-                                            picture_file = save_picture(form.picture.data)
-                                            return redirect(url_for('profile'))
+    try:
+        if request.method == 'POST':
+            if(str(age).isdigit()):
+                if age >= 21:
+                    if age <= 85:
+                        if check_interest(interest):
+                            if check_bio(bio):
+                                if check_gender(gender):
+                                    if check_sexualP(sexualPreference):
+                                        if user_update(form) == True:
+                                            if form.picture.data:
+                                                picture_file = save_picture(form.picture.data)
+                                                return redirect(url_for('profile'))
+                                            else:
+                                                flash('You need to upload a profile picture', 'danger')
+                                                return render_template('public/update_profile.html',form=form, isUpdate=True)
                                         else:
-                                            flash('You need to upload a profile picture', 'danger')
+                                            flash('Something went wrong.' 'danger')
                                             return render_template('public/update_profile.html',form=form, isUpdate=True)
                                     else:
-                                        flash('Something went wrong.' 'danger')
-                                        return render_template('public/update_profile.html',form=form, isUpdate=True)
+                                        flash('Sexual preference selection is incorrect.', 'danger')
+                                        return render_template('public/update_profile.html',form=form, isUpdate=True)        
                                 else:
-                                    flash('Sexual preference selection is incorrect.', 'danger')
-                                    return render_template('public/update_profile.html',form=form, isUpdate=True)        
+                                    flash('Gender selection is incorrect.', 'danger')
+                                    return render_template('public/update_profile.html',form=form, isUpdate=True)
                             else:
-                                flash('Gender selection is incorrect.', 'danger')
+                                flash('Your biography needs to be a minimum of four characters long, please try again.', 'danger')
                                 return render_template('public/update_profile.html',form=form, isUpdate=True)
                         else:
-                            flash('Your biography needs to be a minimum of four characters long, please try again.', 'danger')
+                            flash('You need begin your interests with # (Hashtag)', 'danger')
                             return render_template('public/update_profile.html',form=form, isUpdate=True)
                     else:
-                        flash('You need begin your interests with # (Hashtag)', 'danger')
-                        return render_template('public/update_profile.html',form=form, isUpdate=True)
+                        flash('You are too old, please try again in your next lifetime.', 'danger')
+                        return render_template('public/update_profile.html',form=form, isUpdate=True)    
                 else:
-                    flash('You are too old, please try again in your next lifetime.', 'danger')
-                    return render_template('public/update_profile.html',form=form, isUpdate=True)    
+                    flash('You are too young, please try again in the near future.', 'danger')
+                    return render_template('public/update_profile.html',form=form, isUpdate=True)
             else:
-                flash('You are too young, please try again in the near future.', 'danger')
+                flash('Age needs to be a valid number between 21 and 85 years, please try again', 'danger')
                 return render_template('public/update_profile.html',form=form, isUpdate=True)
         else:
-            flash('Age needs to be a valid number between 21 and 85 years, please try again', 'danger')
-            return render_template('public/update_profile.html',form=form, isUpdate=True)
-    else:
+            if check_where() == True:
+                flash('That page can only be accessed on first time sign in.', 'danger')
+                return redirect(url_for('profile'))
+            else:
+                return render_template('public/update_profile.html',form=form, isUpdate=True)
+    except:
+        flash("The picture is of invalid format or too big of a size to upload, please upload a file ending with either .jpg, .png or .peg which is not greater than 2MB in size and try again.",'danger')
         return render_template('public/update_profile.html',form=form, isUpdate=True)
 
 def save_picture(form_picture):
@@ -1924,59 +1975,65 @@ def account():
     gender = form.gender.data
     sexualPreference = form.sexualPreference.data
 
-    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        cursor=cnx.cursor()
+    try:
+        if check_where():
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
         
-        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
-        existing = cursor.fetchone()
+                cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+                existing = cursor.fetchone()
     
-    notification = existing[-2]
-    # existing_blog_post = find_blog_post(id_)
-    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        cursor=cnx.cursor()
+            notification = existing[-2]
         
-        cursor.execute(find_user_by_id(id))
-        existing_user = cursor.fetchone()
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
+        
+                cursor.execute(find_user_by_id(id))
+                existing_user = cursor.fetchone()
 
-    if request.method == 'POST':
+            if request.method == 'POST':
         
-        if check_username(username):
-            upd_username(form)
-        else:
-            flash('The username field must be between 2 to 30 characters long and can be AlphaNumeric, please try again', 'danger')
-        if check_mail(email):
-            upd_email(form)
-        else:
-            flash('The email address is invalid, please try again','danger')
-        if str(age).isdigit():
-            if age >= 21:
-                if age <= 85:
-                    upd_age(form)
+                if check_username(username):
+                    upd_username(form)
                 else:
-                    flash('You are too old, please try again in your next lifetime.', 'danger')
-            else:
-                flash('You are too young, please try again in the near future.', 'danger')    
+                    flash('The username field must be between 2 to 30 characters long and can be AlphaNumeric, please try again', 'danger')
+                if check_mail(email):
+                    upd_email(form)
+                else:
+                    flash('The email address is invalid, please try again','danger')
+                if str(age).isdigit():
+                    if age >= 21:
+                        if age <= 85:
+                            upd_age(form)
+                        else:
+                            flash('You are too old, please try again in your next lifetime.', 'danger')
+                    else:
+                        flash('You are too young, please try again in the near future.', 'danger')    
+                else:
+                    flash('Age needs to be a valid number between 21 and 85 years, please try again', 'danger')    
+                if check_interest(interest):
+                    upd_interest(form)
+                else:
+                    flash('You need begin your interests with # (Hashtag)', 'danger')
+                if check_bio(bio):
+                    upd_bio(form)
+                else:
+                    flash('Your biography needs to be a minimum of four characters long, please try again.', 'danger')
+                if check_gender(gender):
+                    upd_gender(form)
+                else:
+                    flash('Gender selection is incorrect.', 'danger')
+                if check_sexualP(sexualPreference):
+                    upd_sexual(form)
+                else:
+                    flash('Sexual preference selection is incorrect.', 'danger')
+                if form.picture.data:
+                    picture_file = save_picture(form.picture.data)
         else:
-            flash('Age needs to be a valid number between 21 and 85 years, please try again', 'danger')    
-        if check_interest(interest):
-            upd_interest(form)
-        else:
-            flash('You need begin your interests with # (Hashtag)', 'danger')
-        if check_bio(bio):
-            upd_bio(form)
-        else:
-            flash('Your biography needs to be a minimum of four characters long, please try again.', 'danger')
-        if check_gender(gender):
-            upd_gender(form)
-        else:
-            flash('Gender selection is incorrect.', 'danger')
-        if check_sexualP(sexualPreference):
-            upd_sexual(form)
-        else:
-            flash('Sexual preference selection is incorrect.', 'danger')
-        if form.picture.data:
-            picture_file = save_picture(form.picture.data)
-        
+            flash("You need to fill in all your information on this page before you are granted access to any page within the app.",'danger')
+            return redirect(url_for('update'))   
+    except:
+        flash("The picture is of invalid format or too big of a size to upload, please upload a file ending with either .jpg, .png or .peg which is not greater than 2MB in size and try again.",'danger')
 
     return render_template('public/account.html',notification_numb=existing[-1],form=form,existing_user=existing_user[0],notification=notification,isHere=True)
 

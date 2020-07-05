@@ -167,6 +167,7 @@ def user_update(form):
         flash('An erro has happend','danger')
         print(err)
 
+
 def user_login(form):
 
     username = form.username.data
