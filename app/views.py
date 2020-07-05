@@ -1478,6 +1478,7 @@ def profile():
                             cnx.commit()
 
                  # if len(existing_user['coordinates']) == 0:
+         
                 #         coordinates_update(existing_user,req)
 
              #     coord =[]
