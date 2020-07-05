@@ -9,15 +9,18 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" crossorigin="anonymous">
 
+<div class="container">
+  
+</div>
 <div class="content-section">
     <div class="media">
         <div class="media-body">
-          <legend>profile-update</legend>
-  <h6 style="color:red">The information on this page needs to be filled in before you can continue to use the application!</h6>
+  
   <form method="POST" action="" enctype="multipart/form-data">
     
       {{ form.hidden_tag() }}
       <fieldset class="form-group">
+        <legend>profile-update</legend>
         {{ form.age.label(class='form-control-label')}}
         {%if form.age.errors %}
         <div class="invalid-feedback">
@@ -55,7 +58,7 @@
         {% else %}
         {{ form.bio(class="form-control form-control-lg")}}
         {% endif %}
-        <br>  
+              
         <div class="form-group">
           {{ form.gender.label(class='')}}
           {%if form.gender.errors %}
@@ -69,7 +72,7 @@
           {{ form.gender(class="")}}
           {% endif %}
         </div>
-        <br>
+
         <div class="form-group">
           {{ form.sexualPreference.label(class='')}}
           {{ form.sexualPreference(class="")}}
@@ -84,7 +87,7 @@
               {% endfor %}
           {% endif %}
         </div>
-        <br>
+        
       
         
         
