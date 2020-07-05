@@ -1410,6 +1410,21 @@ def profile():
         # for i in posts:
         #     for k in i:
         #         post.append(k)
+
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor = cnx.cursor()
+            cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS `distance`(
+            d_id VARCHAR(100) ,
+            user_id VARCHAR(200) NOT NULL,
+            distance FLOAT NOT NULL, 
+            PRIMARY KEY(user_id),
+            FOREIGN KEY(d_id) REFERENCES `users`(user_id)
+            )
+            """
+            )
+            cnx.commit()
         
         if request.is_json:
             req = request.get_json()
@@ -1501,20 +1516,7 @@ def profile():
 
                         # print(norman_ok)
                         d.append(distance.distance(okc_ok , norman_ok ).km)
-                        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-                            cursor = cnx.cursor()
-                            cursor.execute(
-                            """
-                            CREATE TABLE IF NOT EXISTS `distance`(
-                            d_id VARCHAR(100) ,
-                            user_id VARCHAR(200) NOT NULL,
-                            distance FLOAT NOT NULL, 
-                            PRIMARY KEY(user_id),
-                            FOREIGN KEY(d_id) REFERENCES `users`(user_id)
-                            )
-                            """
-                            )
-                            cnx.commit()
+
 
                         # with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                         #     cursor = cnx.cursor()

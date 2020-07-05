@@ -56,13 +56,14 @@
                 </script>
             </div>
             <div class="col-md-4">
+                
                 <div class="content-section">
                   <h3>Recommendation bar</h3>
                   {% for i in database1%}
-                  {% if i[2] < 20%}
-              
-                  <p><a href="{{ url_for('post',post_id=i[1])}}">{{i[1]}}</a> is {{i[2]}} km away from you</p>
-                  {% endif %}
+                    {% if existing_user[1] != i[1]%}
+                    <p><a href="{{ url_for('post',post_id=i[1])}}">{{i[1]}}</a> is {{i[2]}} km away from you</p>
+                    {% endif %}
+             
                   {% endfor %}
  
                 </div>
