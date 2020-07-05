@@ -348,7 +348,6 @@ def create_users(form):
             if user_number[0] != 1:
                 
                 if email_number[0] != 1:
-
                     print(session.get("TOKEN"))
                     cursor.execute(
                     f"""INSERT INTO  
