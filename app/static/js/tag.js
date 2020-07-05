@@ -7,9 +7,7 @@
     hiddenInput.setAttribute('name', el.getAttribute('data-name'));
 
     mainInput.setAttribute('type', 'text');
-    mainInput.setAttribute('id','main');
     mainInput.classList.add('main-input');
-    mainInput.setAttribute('list','languageList');
     mainInput.addEventListener('input', function () {
         let enteredTags = mainInput.value.split(',');
         if (enteredTags.length > 1) {
@@ -49,29 +47,10 @@
     el.appendChild(mainInput);
     el.appendChild(hiddenInput);
 
-    var interest = document.getElementById('interest').innerText
-            
-            
-            
             
     function filterT (tag) {
         return tag.replace(/\s+/g, ',');
     }
-
-    var look = filterT(interest)
-    console.log(look)
-
-    let entered = look.split(',');
-
-    if (entered.length > 1) {
-        entered.forEach(function (t) {
-            let filteredTag = filterTag(t);
-            if (filteredTag.length > 0)
-                addTag(filteredTag);
-        })
-    }
-    // addTag(entered)
-
 
     function addTag (text) {
         let tag = {
@@ -82,12 +61,6 @@
         tag.element.classList.add('tag');
         tag.element.textContent = tag.text;
 
-        // newlink = document.createElement('a');
-        // newlink.setAttribute('class', 'signature');
-        // div = document.querySelector('signature');
-        // el.insertBefore(newlink,mainInput);
-        // newlink.innerHTML=el.element
-       
 
         let closeBtn = document.createElement('span');
         closeBtn.classList.add('close');
@@ -127,23 +100,3 @@
 });
 
 
-[].forEach.call(document.getElementsByClassName('tag'), function (el) {
-    el.addEventListener('click',(e)=>{
-        // console.log(e)
-        var names = (e.target.innerText)
-        console.log(e.target.className)
-
-        if(names[0] === '#'){
-            var new_names = names.replace(/#/,'')
-            console.log(new_names)
-            if(e.target.className === 'tag'){
-                window.open("http://127.0.0.1:5000/hash_tag/"+new_names ,'_self');
-            }
-
-        }else if(e.target.className === 'tag'){
-            window.open("http://127.0.0.1:5000/hash_tag/"+names ,'_self');
-        }
-        // console.log(typeof(names))
-
-    })
-})

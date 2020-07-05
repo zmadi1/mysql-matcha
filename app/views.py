@@ -1,5 +1,6 @@
 from flask import jsonify,abort,make_response,render_template,url_for,flash,g, redirect,session,request,make_response
 from app import app
+from bson.codec_options import CodecOptions
 # from flask_bcrypt import Bcrypt
 from functools import wraps
 import pyproj
@@ -8,6 +9,8 @@ from geopy import distance
 from PIL import Image
 from operator import itemgetter
 import datetime
+from bson.json_util import loads, dumps
+import bson
 
 from flask_login import LoginManager
 from app.forms import RegistrationForm,PostForm, LoginForm, UpdateAccountForm, UploadsForm, MessageForm,ForgotForm
@@ -20,8 +23,18 @@ from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO,send,emit,join_room, leave_room
 import time
 from time import localtime,strftime
-
+from bson.json_util import loads
 from itsdangerous import SignatureExpired, URLSafeTimedSerializer
+import re 
+  
+# Regular expression for validating an Email 
+mail_regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+# for custom mails use: '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$'
+
+username_regex = '\w' # fuck me sideways equivalent is '[a-zA-Z0-9_]'
+firstname_regex = '[a-zA-Z]+'
+passwd_regex = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$'
+interest_regex = '^#'
 
 # bcrypt = Bcrypt(app)
 mail = Mail(app)
@@ -34,6 +47,7 @@ geod = pyproj.Geod(ellps='WGS84')
 socketio = SocketIO(app)
 
 ROOMS = ["lounge","news","games","coding"]
+
 
 
 
@@ -306,6 +320,7 @@ def message():
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         cursor=cnx.cursor()
         cursor.execute(f"SELECT `username` FROM `users` WHERE `user_id`='{id}'")
+        
         user = cursor.fetchall()
     
     # print(f"{user[0][0]} hello--------------------------")
@@ -980,6 +995,69 @@ def query():
 
 
 # ?foo=foo&bar=bar&baz=baz&title=query+strings+with+flask
+def check_mail(email):  
+    if(re.search(mail_regex,email)):  
+        return True           
+    else:  
+        return False
+
+def check_username(username):  
+    if(re.search(username_regex,username)):
+        if len(username) > 1:
+            if len(username) < 31:   
+                return True  
+    else:  
+        return False
+
+def check_first_last_name(firstname):  
+    if(re.search(firstname_regex,firstname)):
+        if len(firstname) > 1:
+            if len(firstname) < 31:   
+                return True  
+    else:  
+        return False
+
+def check_passwd(passwd): 
+    pat = re.compile(passwd_regex)       
+    mat = re.search(pat, passwd)  
+    if mat: 
+        return True 
+    else: 
+        return False 
+
+def check_interest(interest):  
+    if(re.search(interest_regex,interest)):  
+        return True           
+    else:  
+        return False
+
+def check_bio(bio):  
+    if(re.search(firstname_regex,bio)):
+        if len(bio) > 3:
+            if len(bio) < 401:   
+                return True  
+    else:  
+        return False
+
+def check_gender(gender):  
+        if gender == 'Male':
+            return True
+        elif gender == 'Female':   
+            return True
+        elif gender == 'Other':  
+            return True
+        else:  
+            return False
+
+def check_sexualP(sexualPreference):
+        if sexualPreference == 'Male':
+            return True
+        elif sexualPreference == 'Female':   
+            return True
+        elif sexualPreference == 'Bisexual':  
+            return True
+        else:  
+            return False
 
 @app.route('/registration',methods=['POST','GET'])
 def registration():
@@ -988,36 +1066,45 @@ def registration():
 
     
     if request.method =='POST':
-        create_users(form)
         email = form.email.data
+        username = form.username.data
+        firstname = form.firstname.data
+        lastname = form.lastname.data
+        password = form.password.data
+        confirm_password = form.confirm_password.data
 
-        # print(session.get("token"))
-        # print(token)
-        # print('Hellooooooooooooo')
-        # print(token)
-        # for key in request.session.keys():
-        #     print("key:=>" + request.session[key])
-
-        print('hello')
-        token = session.get("TOKEN")
-        print("Here")
-        msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
+        if check_username(username):
+            if check_first_last_name(firstname):
+                if check_first_last_name(lastname):
+                    if check_mail(email):
+                        if check_passwd(password):
+                            if confirm_password == password:
+                                if create_users(form):
+                                    token = session.get("TOKEN")
+                                    msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
         
-        link  = url_for('confirm_email',token=token, _external=True)
+                                    link  = url_for('confirm_email',token=token, _external=True)
         
-        msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
+                                    msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
 
-        mail.send(msg)
+                                    mail.send(msg)
 
-        
-        #    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        # cursor=cnx.cursor()
-    
-        # cursor.execute(f"SELECT COUNT(`picture`) FROM `pictures` WHERE `user_id`='{id}'")
-        # picture = cursor.fetchone()
-    
-
-        return redirect(url_for('login'))
+                                    return redirect(url_for('login'))
+                            else:
+                                flash('The two passwords provided do not match, please try again.', 'danger')
+                        else:
+                            flash('The password field should have at least one number', 'danger')
+                            flash('At least one uppercase and one lowercase character', 'danger')
+                            flash('At least one special symbol and be between 6 to 20 characters long', 'danger')
+                            flash('Be between 6 to 20 characters long, please try again', 'danger')
+                    else:
+                        flash('The email address is invalid, please try again','danger')
+                else:
+                    flash('The lastname field must be between 2 to 30 characters long and can only contain English alphabet characters, please try again', 'danger')
+            else:
+                flash('The firstname field must be between 2 to 30 characters long and can only contain English alphabet characters, please try again', 'danger')    
+        else:
+            flash('The username field must be between 2 to 30 characters long and can be AlphaNumeric, please try again', 'danger')                     
     return render_template('public/registration.html',form=form,title='SignUp')
 
 
@@ -1090,7 +1177,6 @@ def login():
             elif user_login(form) == False:
                 return redirect(url_for('update'))
             else:
-                flash('The Username or Password field is incorrect','danger')
                 return redirect(request.url)
         except TypeError:
             flash("The Username or Password field is incorrect",'danger')
@@ -1306,16 +1392,16 @@ def profile():
                                 if pic[1] in users:
                                     continue
                                 else:
-                                    print(pic[0])
-                                    print('-----------------------')
-                                    print(picture)
+                                    # print(pic[0])
+                                    # print('-----------------------')
+                                    # print(picture)
                                     # if pic[0] == 
                                     if picture != []:
                                         users.append(pic[1])#
                                         posts.append(picture[0])#
             # with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                 # cursor=cnx.cursor()
-                print(existing_user[-2])
+                # print(existing_user[-2])
         
         # interest_return = list(dict.fromkeys(interest_return))
         gis_id =secrets.token_urlsafe()
@@ -1327,6 +1413,7 @@ def profile():
         
         if request.is_json:
             req = request.get_json()
+            # print(type(req))
 
             with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                 cursor=cnx.cursor()
@@ -1335,7 +1422,8 @@ def profile():
                 CREATE TABLE IF NOT EXISTS `location`(
                 gis_id VARCHAR(100) ,
                 user_id VARCHAR(200) NOT NULL,
-                location JSON, 
+                lat FLOAT NOT NULL,
+                lon FLOAT NOT NULL, 
                 PRIMARY KEY(gis_id),
                 FOREIGN KEY(user_id) REFERENCES `users`(user_id)
                 )
@@ -1347,32 +1435,132 @@ def profile():
                 cursor = cnx.cursor()
                 cursor.execute(f"SELECT COUNT(*) FROM `location` WHERE `user_id`='{existing_user[0]}'")
                 length = cursor.fetchall()
+            
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor = cnx.cursor()
+                cursor.execute(f"SELECT COUNT(*) FROM `location`")
+                old_length = cursor.fetchall()
 
-            print(req)
-            print(length[0][0])
             if length[0][0] == 0:
                 with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                     cursor = cnx.cursor()
 
-                    cursor.execute(f"""INSERT INTO `location`(`gis_id`,`user_id`,`location`)  VALUES("{gis_id}","{existing_user[0]}","{req}")""")
+                    cursor.execute(f"""INSERT INTO `location`(`gis_id`,`user_id`,`lat`,`lon`)  VALUES("{gis_id}","{existing_user[0]}","{req['lat']}","{req['long']}")""")
                     cnx.commit()
 
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor = cnx.cursor()
+                cursor.execute(f"SELECT `lat`, `lon` FROM `location` WHERE `user_id`= '{id}'")
+                
+                location = cursor.fetchone()
+        
+            # print(location)
+            # print(location[1])
+            data = {'lat':location[0],'lon':location[1]}
+
+
+            # data1=json.dumps(data)
+            # print(data1) 
             # if len(existing_user['coordinates']) == 0:
         #         coordinates_update(existing_user,req)
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor = cnx.cursor()
+                cursor.execute(f"SELECT  `lat`, `lon` ,`user_id` FROM `location`")
+                
+                users = cursor.fetchall()
+            
 
-        #     coord =[]
-        #     for post in all_user_post:
-        #         coord.append(post['coordinates'])
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor = cnx.cursor()
+                cursor.execute(f"SELECT  COUNT(*) FROM `location`")
+                
+                location_length = cursor.fetchall()
+            # print(f"{users} this is the extradiction--")
+            d = []
+            coord =[]
+            data1=[]
+            c=[]
 
-        #     okc_ok = (existing_user['coordinates']['lat'], existing_user['coordinates']['long'])
-        #     d = []
-        #     for index in coord:
-        #         norman_ok = (index['lat'], index['long'])
-            #     d.append(distance.distance(okc_ok , norman_ok ).km)
-            # response = make_response(jsonify(req))
-            # return response
 
-    return render_template('public/profile.html', interest_return= interest_return,notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+
+
+            # print( old_length[0][0])
+            # print(location_length[0][0])
+
+            if old_length[0][0] == location_length[0][0]:
+                okc_ok = (data['lat'],data['lon'])
+                for post in users:
+                    if post[2] != id:
+                        # print("||||||||||||||||||||||||||||||||||||||||||")
+                        # print(post[0],post[1],post[2])
+                        # print(post)
+                        # print("###########################################")
+                        coord.append(post[2])
+
+                        norman_ok = (post[0], post[1])
+
+                        # print(norman_ok)
+                        d.append(distance.distance(okc_ok , norman_ok ).km)
+                        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                            cursor = cnx.cursor()
+                            cursor.execute(
+                            """
+                            CREATE TABLE IF NOT EXISTS `distance`(
+                            d_id VARCHAR(100) ,
+                            user_id VARCHAR(200) NOT NULL,
+                            distance FLOAT NOT NULL, 
+                            PRIMARY KEY(user_id),
+                            FOREIGN KEY(d_id) REFERENCES `users`(user_id)
+                            )
+                            """
+                            )
+                            cnx.commit()
+
+                        # with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        #     cursor = cnx.cursor()
+                        #     cursor.execute(f"SELECT  `user_id` FROM `distance`")
+                
+                        #     database1 = cursor.fetchall()
+
+                        # for i in database1:
+                            # print(i[0])
+
+                        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                            cursor = cnx.cursor()
+                            cursor.execute(f"INSERT IGNORE INTO `distance`(`d_id`,`user_id`,`distance`)  VALUES('{id}',(SELECT `username` FROM `users` WHERE `user_id`='{post[2]}'),'{distance.distance(okc_ok , norman_ok ).km}')")
+                            cnx.commit()
+
+                        # c.append({post[2]:distance.distance(okc_ok , norman_ok ).km})
+
+
+                # for j in k:
+ 
+                    # with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                        # cursor = cnx.cursor()
+                        # cursor.execute(f"SELECT `username` FROM `users` WHERE `user_id`='{j}'")
+                    
+                # all_coord = cursor.fetchall()
+
+            # print(all_coord)
+
+
+   
+            # print(coord)
+            # print(d)
+            # for index in users:
+            
+            # print(d)
+            response = make_response(jsonify(data))
+            return response
+        with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+            cursor = cnx.cursor()
+            cursor.execute(f"SELECT  * FROM `distance`")
+    
+            database1 = cursor.fetchall()
+        for i in database1:
+            print(i)
+
+    return render_template('public/profile.html',database1=database1,interest_return= interest_return,notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
     # else:
         # print("Userename not found in session")
         # return redirect(url_for('/login'),existing_user=existing_user,existing_blog_post=existing_blog_post) 
@@ -1688,14 +1876,51 @@ def update():
 
     print(arr)   
     
+    interest = form.interest.data 
+    age = form.age.data
+    bio = form.bio.data
+    gender = form.gender.data
+    sexualPreference =form.sexualPreference.data
+
     if request.method == 'POST':
-        if user_update(form) == True:
-            if form.picture.data:
-                picture_file = save_picture(form.picture.data)
-                return redirect(url_for('profile'))
+        if(str(age).isdigit()):
+            if age >= 21:
+                if age <= 85:
+                    if check_interest(interest):
+                        if check_bio(bio):
+                            if check_gender(gender):
+                                if check_sexualP(sexualPreference):
+                                    if user_update(form) == True:
+                                        if form.picture.data:
+                                            picture_file = save_picture(form.picture.data)
+                                            return redirect(url_for('profile'))
+                                        else:
+                                            flash('You need to upload a profile picture', 'danger')
+                                            return render_template('public/update_profile.html',form=form, isUpdate=True)
+                                    else:
+                                        flash('Something went wrong.' 'danger')
+                                        return render_template('public/update_profile.html',form=form, isUpdate=True)
+                                else:
+                                    flash('Sexual preference selection is incorrect.', 'danger')
+                                    return render_template('public/update_profile.html',form=form, isUpdate=True)        
+                            else:
+                                flash('Gender selection is incorrect.', 'danger')
+                                return render_template('public/update_profile.html',form=form, isUpdate=True)
+                        else:
+                            flash('Your biography needs to be a minimum of four characters long, please try again.', 'danger')
+                            return render_template('public/update_profile.html',form=form, isUpdate=True)
+                    else:
+                        flash('You need begin your interests with # (Hashtag)', 'danger')
+                        return render_template('public/update_profile.html',form=form, isUpdate=True)
+                else:
+                    flash('You are too old, please try again in your next lifetime.', 'danger')
+                    return render_template('public/update_profile.html',form=form, isUpdate=True)    
+            else:
+                flash('You are too young, please try again in the near future.', 'danger')
+                return render_template('public/update_profile.html',form=form, isUpdate=True)
         else:
-            redirect(request.url)
-  
+            flash('Age needs to be a valid number between 21 and 85 years, please try again', 'danger')
+            return render_template('public/update_profile.html',form=form, isUpdate=True)
     else:
         return render_template('public/update_profile.html',arr=arr,form=form, isUpdate=True)
 
@@ -1812,6 +2037,13 @@ def account():
     form=UploadsForm()
 
     id=session.get("USER")
+    username = form.username.data
+    email = form.email.data
+    interest = form.interest.data 
+    age = form.age.data
+    bio = form.bio.data
+    gender = form.gender.data
+    sexualPreference = form.sexualPreference.data
 
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         cursor=cnx.cursor()
@@ -1828,21 +2060,41 @@ def account():
         existing_user = cursor.fetchone()
 
     if request.method == 'POST':
-
-        if form.username.data:
+        
+        if check_username(username):
             upd_username(form)
-        if form.email.data:
+        else:
+            flash('The username field must be between 2 to 30 characters long and can be AlphaNumeric, please try again', 'danger')
+        if check_mail(email):
             upd_email(form)
-        if form.age.data:
-            upd_age(form)
-        if form.interest.data:
+        else:
+            flash('The email address is invalid, please try again','danger')
+        if str(age).isdigit():
+            if age >= 21:
+                if age <= 85:
+                    upd_age(form)
+                else:
+                    flash('You are too old, please try again in your next lifetime.', 'danger')
+            else:
+                flash('You are too young, please try again in the near future.', 'danger')    
+        else:
+            flash('Age needs to be a valid number between 21 and 85 years, please try again', 'danger')    
+        if check_interest(interest):
             upd_interest(form)
-        if form.bio.data:
+        else:
+            flash('You need begin your interests with # (Hashtag)', 'danger')
+        if check_bio(bio):
             upd_bio(form)
-        if form.gender.data:
+        else:
+            flash('Your biography needs to be a minimum of four characters long, please try again.', 'danger')
+        if check_gender(gender):
             upd_gender(form)
-        if form.sexualPreference.data:
+        else:
+            flash('Gender selection is incorrect.', 'danger')
+        if check_sexualP(sexualPreference):
             upd_sexual(form)
+        else:
+            flash('Sexual preference selection is incorrect.', 'danger')
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
         

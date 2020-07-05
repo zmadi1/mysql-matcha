@@ -5,19 +5,18 @@ from wtforms import StringField,SubmitField,FloatField, BooleanField, PasswordFi
 from wtforms.validators import DataRequired, Length,Email,EqualTo
 
 class RegistrationForm(FlaskForm):
-    username =StringField('Username',validators=[DataRequired(),Length(min=2,max=20)])
-    firstname =StringField('Firstname',validators=[DataRequired(),Length(min=2,max=20)])
-    lastname =StringField('Lastname',validators=[DataRequired(),Length(min=2,max=20)])
-    email = StringField('Email',validators=[DataRequired(), Email()])
-    password = PasswordField('Password',validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',validators=[DataRequired(),EqualTo('password')])
+    username =StringField('Username')
+    firstname =StringField('Firstname')
+    lastname =StringField('Lastname')
+    email = StringField('Email')
+    password = PasswordField('Password')
+    confirm_password = PasswordField('Confirm Password')
     submit = SubmitField('Sign up')
 
 
 class LoginForm(FlaskForm):
-    username =StringField('Username',validators=[DataRequired(),Length(min=2,max=20)])
-    #email = StringField('Email',validators=[DataRequired(), Email()])
-    password = PasswordField('Password',validators=[DataRequired()])
+    username =StringField('Username')
+    password = PasswordField('Password')
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
@@ -26,19 +25,16 @@ class LoginForm(FlaskForm):
 
 class ForgotForm(FlaskForm):
     
-    email = StringField('Email',validators=[Email()])
+    email = StringField('Email')
     submit = SubmitField('submit')
     
 
 class UpdateAccountForm(FlaskForm):
-    # username =StringField('Username')
-    # email = StringField('Email',validators=[Email()])
-    age =  IntegerField('Age',validators=[DataRequired()])
+    age =  IntegerField('Age')
     gender = RadioField('Gender', choices=[('Male','Male'),('Female','Female'),('Bisexual','Other')])
-    # picture = FileField('Upload picture',validators=[FileField(['jpg','png'])])
     sexualPreference = RadioField('SexualPreference',choices=[('Male','Male'),('Female','Female'),('Bisexual','Bisexual')])
-    bio = TextAreaField('Biography',validators=[DataRequired(),Length(min=2,max=100)])
-    interest = StringField('Interest',validators=[DataRequired(),Length(min=2,max=100)])
+    bio = TextAreaField('Biography')
+    interest = StringField('Interest')
     picture = FileField('Upload picture',validators=[FileAllowed(['jpg','png','jpeg'])])
     submit = SubmitField('Update')
 
