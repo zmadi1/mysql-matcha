@@ -88,6 +88,9 @@ def count_email(email):
     user= f"SELECT COUNT('email') FROM users WHERE `email`='{email}'"
     return user
 
+def find_acc_verification_status(username):
+    user = f"select `AccountVerification` from users where `username` = '{username}'"
+    return user
 
 # age_update(form,id)
 # bio_update(form,id)
@@ -189,25 +192,32 @@ def user_login(form):
             cursor.execute(find_user_id(username))
             user_id = cursor.fetchone()
             
+            cursor.execute(find_acc_verification_status(username))
+            confirmed_status = cursor.fetchone()
+
             if user[0] == username:
                 if bcrypt.check_password_hash(passwd[0] ,password) == True:
-                    session["USER"] = str(user_id[0])
+                    if confirmed_status[0] == 1:
+                        session["USER"] = str(user_id[0])
 
-                    if registered[0] == 1:
-                        return  True
+                        if registered[0] == 1:
+                            return  True
+                        else:
+                            return redirect(url_for('update'))
                     else:
-                        flash('The Username or Password field is incorrect','danger')
+                        flash('You need to confirm your account before you can login','danger')
                         return False
                 else:
-                    return redirect(request.url)           
+                    return False           
             else:
-                return redirect(request.url)
+                return False
         # cnx.commit()
         cursor.close()
     except mysql.connector.Error as err:
         print(err)
         
     return
+    
 def resetP(form):
     email = form.email.data
 

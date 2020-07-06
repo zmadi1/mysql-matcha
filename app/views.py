@@ -1138,10 +1138,6 @@ def registration():
 @app.route('/confirm_email/<token>')
 def confirm_email(token):
 
-  
-
-    # Get user by username
-
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         cursor=cnx.cursor()
     
@@ -1204,8 +1200,6 @@ def login():
             if user_login(form) == True:
                 flash('You have logged in ','success')
                 return redirect(url_for('profile'))
-            elif user_login(form) == False:
-                return redirect(url_for('update'))
             else:
                 return redirect(request.url)
         except TypeError:
