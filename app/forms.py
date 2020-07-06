@@ -13,29 +13,25 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password')
     submit = SubmitField('Sign up')
 
-
 class LoginForm(FlaskForm):
     username =StringField('Username')
     password = PasswordField('Password')
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
-
-
-
-class ForgotForm(FlaskForm):
-    
+class ForgotForm(FlaskForm):    
     email = StringField('Email')
+    password = PasswordField('Password')
+    confirm_password = PasswordField('Confirm Password')
     submit = SubmitField('submit')
     
-
 class UpdateAccountForm(FlaskForm):
     age =  IntegerField('Age')
     gender = RadioField('Gender', choices=[('Male','Male'),('Female','Female'),('Bisexual','Other')])
     sexualPreference = RadioField('SexualPreference',choices=[('Male','Male'),('Female','Female'),('Bisexual','Bisexual')])
     bio = TextAreaField('Biography')
     interest = StringField('Interest')
-    picture = FileField('Upload picture',validators=[FileAllowed(['jpg','png','jpeg'])])
+    picture = FileField('Upload picture')
     submit = SubmitField('Update')
 
 class UploadsForm(FlaskForm):
@@ -48,7 +44,7 @@ class UploadsForm(FlaskForm):
     sexualPreference = RadioField('SexualPreference',choices=[('Male','Male'),('Female','Female'),('Bisexual','Bisexual')])
     bio = TextAreaField('Biography')
     interest = StringField('Interest')
-    picture = FileField('Upload picture',validators=[FileAllowed(['jpg','png','jpeg'])])
+    picture = FileField('Upload picture')
     submit = SubmitField('Update')
 
 

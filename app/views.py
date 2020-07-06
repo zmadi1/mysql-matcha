@@ -1140,7 +1140,7 @@ def confirm_email(token):
 
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
         cursor=cnx.cursor()
-    
+        
         cursor.execute(f"SELECT COUNT(user_id) FROM `users` WHERE `tokenCode`= '{token}'")
         check_token = cursor.fetchone()
 
@@ -1153,41 +1153,88 @@ def confirm_email(token):
                 cnx.commit()
                 # Close connection
                 # token = s.dumps(email,salt='email-confirm')
-                email = s.loads(token,salt='email-confirm', max_age=600)
+                # email = s.loads(token,salt='email-confirm', max_age=600)
                 return redirect(url_for('login'))
         except SignatureExpired:
             return 'nothing was the same'
     return "success"
 
-@app.route('/forgotpass')
+@app.route('/confirmer/<token>/<changed>/<email>')
+def confirmer(token,changed,email):
+
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        
+        cursor.execute(f"SELECT COUNT(user_id) FROM `users` WHERE `tokenCode`= '{token}'")
+        check_token = cursor.fetchone()
+        # try:
+        if check_token[0] > 0:
+            changed = bcrypt.generate_password_hash(changed).decode('utf-8')
+            cursor.execute(f"UPDATE `users` SET  `AccountVerification` = 0 WHERE `tokenCode` = '{token}'")
+            cursor.execute(f"UPDATE `users` SET `password` = '{changed}' WHERE `tokenCode` = '{token}'")
+            cnx.commit()
+
+            msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
+        
+            link  = url_for('confirm_email',token=token, _external=True)
+        
+            msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
+
+            mail.send(msg)
+            return redirect(url_for('login'))
+        # except:
+            # return 'nothing was the same'
+    return "success"
+
+@app.route('/forgotpass',methods=['POST','GET'])
 @is_access
 def forgot_pass():
 
     form = ForgotForm()
+    
+    email = form.email.data
+    password = form.password.data
+    confirm_password = form.confirm_password.data
+    
+    try:
+        if request.method =='POST':
 
-    return render_template('public/forgotpass.html',form=form)
+            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                cursor=cnx.cursor()
 
-@app.route('/reset_passwd', methods=['POST','GET'])
-@is_access
-def reset_passwd():
-    form = ForgotForm(request.form)
-
-    if request.method =='POST':
-        if form.validate():
-            resetP(form)
-            email = form.email.data
-            token = session.get("TOKEN")
-            # link  = url_for('change_pass',token=token, _external=True)
-        
-        # msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
-            msg = Message('Change password',sender='Matcha dating services', recipients=[email])
-            msg.body=f"Click here to change your password <a href='http://127.0.0.1:5000/changer' target='_blank'>Change Password</a>"
-            mail.send(msg)
-            return redirect(url_for('login'))
-
-# @app.route('/changer', methods=['POST','GET'])
-# def changer():
-
+                cursor.execute(count_email(email))
+                email_number = cursor.fetchone()
+                
+                cursor.execute(f"SELECT `tokenCode` FROM `users` WHERE `email`= '{email}'")
+                token = cursor.fetchone()
+            
+            if email_number[0] == 1:
+                if check_passwd(password):
+                    if confirm_password == password:
+                        if token[0]:
+                            link  = url_for('confirmer',token=token[0],changed=password,email=email, _external=True)
+                            msg = Message('Change password',sender='Matcha dating services', recipients=[email])
+                            msg.body=f"Hi there, you have received this email because a request to change your password was made.<br> Click here <a href='{link}' target='_blank'>Change Password</a> to confirm your new set password, If you did NOT make that requst<br> kindly IGNORE this email."
+                            mail.send(msg)
+                            flash('Password changed successfull, to apply the changes please click on the email link that we have sent you.', 'success')
+                            return redirect(url_for('login'))
+                        else:
+                            flash('Something does not add up regarding your account', 'danger')
+                            return redirect(url_for('forgotpass'))
+                    else:
+                        flash('Your passwords do not match, please try again.', 'danger')
+                        return redirect(url_for('forgotpass'))
+                else:
+                    flash('The password provided does not meet minimum password complexity requirements, please try again.', 'danger')
+                    return redirect(url_for('forgotpass'))
+            else:
+                flash('Password changed successfull, to apply the changes please click on the email link that we have sent you.' 'success')
+                return redirect(url_for('forgotpass'))
+        else:
+            return render_template('public/forgotpass.html',form=form)
+    except:
+        flash('Sorry smething went wrong.', 'danger')
+        return render_template('public/forgotpass.html',form=form)
 
 @app.route('/',methods=['POST','GET'])
 @is_access
