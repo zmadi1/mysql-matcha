@@ -99,12 +99,27 @@
                         {{ form.gender(class="")}}
                         {% endif %}
                       </div>
-              
+                      <div class="form-group">
+                          {{ form.city.label(class="form-control-label") }}
+                          
+                          {% if form.city.errors %}
+                          {{ form.city(class="form-control form-control-lg is-invalid") }}
+                          <div class="invalid-feedback">
+                              {% for error in form.city.errors %}
+                              <span>{{ error }}</span>
+                              {% endfor %}
+                          </div>
+                          {% else %}
+                          {{ form.city(class="form-control form-control-lg") }}
+                          {% endif %}
+                          
+                          
+                      </div>
+
                       <div class="form-group">
                         {{ form.sexualPreference.label(class='')}}
                         {{ form.sexualPreference(class="")}}
                       </div>
-              
                       <div class="form-group">
                         {{ form.picture.label() }}
                         {{ form.picture(class="form-control-file") }}

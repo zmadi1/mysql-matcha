@@ -1047,7 +1047,7 @@ def check_gender(gender):
         if gender == 'Male':
             return True
         elif gender == 'Female':   
-            return True
+            return  True
         elif gender == 'Other':  
             return True
         else:  
@@ -1059,6 +1059,8 @@ def check_sexualP(sexualPreference):
         elif sexualPreference == 'Female':   
             return True
         elif sexualPreference == 'Bisexual':  
+            return True
+        elif sexualPreference == None:
             return True
         else:  
             return False
@@ -1626,7 +1628,7 @@ def gen_male():
                             users.append(pic[1])
                             posts.append(picture[0])
 
-    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,notification_numb=existing_user[-1],posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],existing_user=existing_user,notification_numb=existing_user[-1],posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True, madness=True)
 
 @app.route('/gen_female',methods=['GET','POST'])
 @is_logged_in
@@ -1697,7 +1699,7 @@ def gen_female():
                             users.append(pic[1])
                             posts.append(picture[0])
 
-    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True, madness=True)
 
 @app.route('/gen_bi',methods=['GET','POST'])
 @is_logged_in
@@ -1768,7 +1770,7 @@ def gen_bi():
                             users.append(pic[1])
                             posts.append(picture[0])
 
-    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True, madness=True)
 
 @app.route('/gen_all',methods=['GET','POST'])
 @is_logged_in
@@ -1839,7 +1841,7 @@ def gen_all():
                             users.append(pic[1])
                             posts.append(picture[0])
 
-    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True)
+    return render_template('public/profile.html',notification=existing_user[-2],notification_numb=existing_user[-1],existing_user=existing_user,posts=posts,profile=profile, users=users, user=session["USER"],username=username, isIndex=True, madness=True)
 
 @app.route("/logout")
 @is_logged_in
@@ -1874,6 +1876,7 @@ def update():
     gender = form.gender.data
     sexualPreference =form.sexualPreference.data
 
+    print(sexualPreference)
     try:
         if request.method == 'POST':
             if(str(age).isdigit()):
@@ -1888,7 +1891,7 @@ def update():
                                                 picture_file = save_picture(form.picture.data)
                                                 return redirect(url_for('profile'))
                                             else:
-                                                flash('You need to upload a profile picture', 'danger')
+                                                flash('You need to upload a profile picture/upda', 'danger')
                                                 return render_template('public/update_profile.html',form=form, isUpdate=True)
                                         else:
                                             flash('Something went wrong.' 'danger')
@@ -2043,6 +2046,7 @@ def account():
     age = form.age.data
     bio = form.bio.data
     gender = form.gender.data
+    city = form.city.data
     sexualPreference = form.sexualPreference.data
 
     try:

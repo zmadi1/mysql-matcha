@@ -156,7 +156,10 @@ def user_update(form):
             if user[0] != None and user[1] != None:
                 return True
             else:
-                if form.validate_on_submit():
+                # if form.validate_on_submit():
+                if sexualPreference == None:
+                    sexualPreference = 'Bisexual'
+                        
                     cursor.execute(f"UPDATE users SET `age` = '{age}' WHERE `username`='{username[0]}'")
                     cursor.execute(f"UPDATE users SET `bio` = '{bio}' WHERE `username`='{username[0]}'")
                     # cursor.execute(f"UPDATE users SET `gender` = '{gender}' WHERE `username`='{username[0]}'")
@@ -165,7 +168,17 @@ def user_update(form):
                     cursor.execute(f"UPDATE users SET `Interest` = '{interest}' WHERE `username`='{username[0]}'")
                     cursor.execute(f"UPDATE users SET `registered`=TRUE WHERE `username`='{username[0]}'")
                     cnx.commit()
-                return True
+                    return True
+                else:
+                    cursor.execute(f"UPDATE users SET `age` = '{age}' WHERE `username`='{username[0]}'")
+                    cursor.execute(f"UPDATE users SET `bio` = '{bio}' WHERE `username`='{username[0]}'")
+                    # cursor.execute(f"UPDATE users SET `gender` = '{gender}' WHERE `username`='{username[0]}'")
+                    cursor.execute(f"UPDATE users SET `sexualPreference` = '{sexualPreference}' WHERE `username`='{username[0]}'")
+                    cursor.execute(f"UPDATE users SET `gender` = '{gender}' WHERE `username`='{username[0]}'")
+                    cursor.execute(f"UPDATE users SET `Interest` = '{interest}' WHERE `username`='{username[0]}'")
+                    cursor.execute(f"UPDATE users SET `registered`=TRUE WHERE `username`='{username[0]}'")
+                    cnx.commit()
+                    return True
     except mysql.connector.Error as err:
         print('*****************************')
         flash('An erro has happend','danger')
@@ -445,6 +458,7 @@ def upd_age(form):
         if username[0]:
             cursor.execute(f"UPDATE users SET `age` = '{age}' WHERE `username`='{username[0]}'")
             cnx.commit()
+            flash('Your age has been successfully updated.', 'success')
         else:
             cursor.close()
     return True
@@ -462,6 +476,7 @@ def upd_interest(form):
         if username[0]:
             cursor.execute(f"UPDATE users SET `Interest` = '{interest}' WHERE `username`='{username[0]}'")
             cnx.commit()
+            flash('Your interests have been successfully updated.', 'success')
         else:
             cursor.close()
     return True
@@ -479,6 +494,7 @@ def upd_bio(form):
         if username[0]:
             cursor.execute(f"UPDATE users SET `bio` = '{bio}' WHERE `username`='{username[0]}'")
             cnx.commit()
+            flash('Your biography has been successfully updated.', 'success')
         else:
             cursor.close()
     return True
@@ -496,6 +512,7 @@ def upd_gender(form):
         if username[0]:
             cursor.execute(f"UPDATE users SET `gender` = '{gender}' WHERE `username`='{username[0]}'")
             cnx.commit()
+            flash('Your gender has been successfully updated.', 'success')
         else:
             cursor.close()
     return True
@@ -504,17 +521,35 @@ def upd_sexual(form):
     id = session["USER"]
     sexual = form.sexualPreference.data 
     
-    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        cursor=cnx.cursor()
+    if sexual == None:
+        sexual = 'Bisexual'
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
             
-        cursor.execute(find_user_by_id(id))
-        username = cursor.fetchone()    
+            cursor.execute(find_user_by_id(id))
+            username = cursor.fetchone()    
         
-        if username[0]:
-            cursor.execute(f"UPDATE users SET `sexualPreference` = '{sexual}' WHERE `username`='{username[0]}'")
-            cnx.commit()
-        else:
-            cursor.close()
+            if username[0]:
+                cursor.execute(f"UPDATE users SET `sexualPreference` = '{sexual}' WHERE `username`='{username[0]}'")
+                cnx.commit()
+                flash('Your sexual preference has been set to the default "Bisexual" because you submitted the form without selecting one.', 'success')
+            else:
+                cursor.close()
+                return False
+    else:
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+            
+            cursor.execute(find_user_by_id(id))
+            username = cursor.fetchone()    
+        
+            if username[0]:
+                cursor.execute(f"UPDATE users SET `sexualPreference` = '{sexual}' WHERE `username`='{username[0]}'")
+                cnx.commit()
+                flash('Your sexual preference has been successfully updated.', 'success')
+            else:
+                cursor.close()
+                return False
     return True
 # def get_goodies(form):
 #     form.username.data = existing_user[0]
