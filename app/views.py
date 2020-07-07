@@ -1462,6 +1462,7 @@ def profile():
         
                 if request.is_json:
                     req = request.get_json()
+                    print(f"{req} this is the location zakhele you are the best")
 
                     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                         cursor=cnx.cursor()
@@ -1471,7 +1472,8 @@ def profile():
                         gis_id VARCHAR(100) ,
                         user_id VARCHAR(200) NOT NULL,
                         lat FLOAT NOT NULL,
-                        lon FLOAT NOT NULL, 
+                        lon FLOAT NOT NULL,
+                        city TEXT NOT NULL,
                         PRIMARY KEY(gis_id),
                         FOREIGN KEY(user_id) REFERENCES `users`(user_id)
                         )
@@ -1493,7 +1495,7 @@ def profile():
                         with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                             cursor = cnx.cursor()
 
-                            cursor.execute(f"""INSERT INTO `location`(`gis_id`,`user_id`,`lat`,`lon`)  VALUES("{gis_id}","{existing_user[0]}","{req['lat']}","{req['long']}")""")
+                            cursor.execute(f"""INSERT INTO `location`(`gis_id`,`user_id`,`lat`,`lon`,`city`)  VALUES("{gis_id}","{existing_user[0]}","{req['lat']}","{req['long']}","{req['ct']}")""")
                             cnx.commit()
 
                     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
