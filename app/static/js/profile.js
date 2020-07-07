@@ -13,7 +13,7 @@ const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
 
 async function sucessCallback(position) {
 
-    x.innerHTML ="Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude;
+    // x.innerHTML ="Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude;
 
     //Create query for the API.
     var latitude = "latitude=" + position.coords.latitude;
