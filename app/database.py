@@ -551,6 +551,25 @@ def upd_sexual(form):
                 cursor.close()
                 return False
     return True
+
+def upd_city(form):
+    id = session["USER"]
+    city = form.city.data 
+    
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+            
+        # cursor.execute(find_user_by_id(id))
+        # username = cursor.fetchone()    
+        print(id)
+        if city is not None:
+            cursor.execute(f"UPDATE location SET `city` = '{city}' WHERE `user_id`='{id}'")
+            cnx.commit()
+            flash('You have successfully updated your city.', 'success')
+        else:
+            flash('Something', 'danger')
+            cursor.close()
+    return True
 # def get_goodies(form):
 #     form.username.data = existing_user[0]
 #     form.email.data =email_and_username_by_id[0]
