@@ -1391,6 +1391,22 @@ def upload_image():
 @is_logged_in
 def profile():
 
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor = cnx.cursor()
+        cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS `reports`(
+        r_id VARCHAR(100) ,
+        user_id VARCHAR(200) NOT NULL,
+        username TEXT NOT NULL,
+        status TEXT NOT NULL, 
+        PRIMARY KEY(user_id),
+        FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+        )
+        """
+        )
+        cnx.commit()
+
     try:
         if check_where() == True:
             if session.get('USER',None) is not None:
@@ -1412,6 +1428,16 @@ def profile():
                     profile_pic = cursor.fetchall()
             
                     cnx.close()
+                
+                with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                    cursor=cnx.cursor()
+            
+                    cursor.execute(f"SELECT * FROM `reports` WHERE `user_id`='{id}'")
+                    reports = cursor.fetchall()
+            
+                    cnx.close()
+                
+                print(f"{reports} these are the reports$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4")
 
 
 
@@ -1453,24 +1479,44 @@ def profile():
             
            
                     if pic[1] != existing_user[1]:
-          
-                        if existing_user[11] == pic[10]:
-                            for i in users_i:#other user interest
-                                for k in user_k:#current user interest
-                                    if i == k:
-                                        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-                                            cursor=cnx.cursor()
-                                    
-                                            cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")#other user pic
-                                    
-                                            picture = cursor.fetchall()
-                                    
-                                        if pic[1] in users:
-                                            continue
-                                        else:
-                                            if picture != []:
-                                                users.append(pic[1])#
-                                                posts.append(picture[0])#
+                        if reports != []:
+                            for i in reports:
+                                if i[-2] != pic[1]:
+                                    if existing_user[11] == pic[10]:
+                                        for i in users_i:#other user interest
+                                            for k in user_k:#current user interest
+                                                if i == k:
+                                                    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                                                        cursor=cnx.cursor()
+    
+                                                        cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")#other user pic
+    
+                                                        picture = cursor.fetchall()
+    
+                                                    if pic[1] in users:
+                                                        continue
+                                                    else:
+                                                        if picture != []:
+                                                            users.append(pic[1])#
+                                                            posts.append(picture[0])#
+                        else:
+                            if existing_user[11] == pic[10]:
+                                for i in users_i:#other user interest
+                                    for k in user_k:#current user interest
+                                        if i == k:
+                                            with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+                                                cursor=cnx.cursor()
+
+                                                cursor.execute(f"SELECT `picture` FROM `pictures` WHERE `user_id`='{pic[0]}'")#other user pic
+
+                                                picture = cursor.fetchall()
+
+                                            if pic[1] in users:
+                                                continue
+                                            else:
+                                                if picture != []:
+                                                    users.append(pic[1])#
+                                                    posts.append(picture[0])#
             
                 gis_id =secrets.token_urlsafe()
 
@@ -2282,21 +2328,7 @@ def delete_post(post_id):
     # print(f"{id} this is the users position")
 
     r_id =secrets.token_urlsafe()
-    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
-        cursor = cnx.cursor()
-        cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS `reports`(
-        r_id VARCHAR(100) ,
-        user_id VARCHAR(200) NOT NULL,
-        username TEXT NOT NULL,
-        status TEXT NOT NULL, 
-        PRIMARY KEY(user_id),
-        FOREIGN KEY(user_id) REFERENCES `users`(user_id)
-        )
-        """
-        )
-        cnx.commit()
+    
 
     with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
         cursor = cnx.cursor()
