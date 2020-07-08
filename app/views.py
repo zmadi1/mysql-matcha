@@ -62,6 +62,27 @@ def is_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'USER' in session:
+            id = session.get("USER")
+            s_id =secrets.token_urlsafe()
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor = cnx.cursor()
+                cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS `status`(
+                s_id VARCHAR(100) ,
+                user_id VARCHAR(200) NOT NULL,
+                status TEXT NOT NULL, 
+                PRIMARY KEY(user_id),
+                FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+                )
+                """
+                )
+                cnx.commit()
+            with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                cursor = cnx.cursor()
+                cursor.execute(f"INSERT IGNORE INTO `status`(`s_id`,`user_id`,`status`) VALUES('{s_id}','{id}',TRUE)")
+                cnx.commit()
+                
             return f(*args, **kwargs)
         else:
             flash('Unauthorized, Please login', 'danger')
@@ -1387,6 +1408,8 @@ def profile():
                     cnx.close()
 
 
+
+
                 print(profile_pic)        
                 with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
                     cursor=cnx.cursor()    
@@ -2130,11 +2153,15 @@ def post(post_id):
     user =post_id
 
     if user != 'tagify.css':
-        print(f"{user}^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^))))))))))))))))))))))))))))))))0")
+        # print(f"{user}^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^))))))))))))))))))))))))))))))))0")
         # id = str(post_id)
         # print(id)
 
         id = session.get("USER")
+
+        
+
+
 
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
