@@ -2074,14 +2074,14 @@ def account():
     city = form.city.data
     sexualPreference = form.sexualPreference.data
 
-    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        cursor=cnx.cursor()
-                
-        cursor.execute(f"SELECT `city` FROM `location` WHERE `user_id`= '{id}'") 
-        current_location = cursor.fetchall()
-    print(current_location)
     
     try:
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+                    
+            cursor.execute(f"SELECT `city` FROM `location` WHERE `user_id`= '{id}'") 
+            current_location = cursor.fetchone()
+        print(current_location)
         if check_where():
             with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
                 cursor=cnx.cursor()
@@ -2145,7 +2145,7 @@ def account():
     except:
         flash("The picture is of invalid format or too big of a size to upload, please upload a file ending with either .jpg, .png or .peg which is not greater than 2MB in size and try again.",'danger')
 
-    return render_template('public/account.html',notification_numb=existing[-1],form=form,existing_user=existing_user[0],notification=notification,isHere=True)
+    return render_template('public/account.html',current_location =current_location ,notification_numb=existing[-1],form=form,existing_user=existing_user[0],notification=notification,isHere=True)
 
 
 @app.route("/post/new",methods=['GET','POST'])
