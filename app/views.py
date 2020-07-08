@@ -78,9 +78,10 @@ def is_logged_in(f):
                 """
                 )
                 cnx.commit()
+
             with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
                 cursor = cnx.cursor()
-                cursor.execute(f"INSERT IGNORE INTO `status`(`s_id`,`user_id`,`status`) VALUES('{s_id}','{id}',TRUE)")
+                cursor.execute(f"INSERT IGNORE INTO `status`(`s_id`,`user_id`,`status`) VALUES('{s_id}','{id}','online')")
                 cnx.commit()
                 
             return f(*args, **kwargs)
@@ -1395,6 +1396,11 @@ def profile():
             if session.get('USER',None) is not None:
 
                 id=session.get("USER")
+                with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+                    cursor = cnx.cursor()
+                    # PDATE users SET `registered`=TRUE WHERE `username`='{username[0]
+                    cursor.execute(f"UPDATE status SET `status`='online' WHERE `user_id`='{id}'")
+                    cnx.commit()
 
                 with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
                     cursor=cnx.cursor()
@@ -1859,9 +1865,6 @@ def gen_all():
                     if pic[1] in users:
                         continue
                     else:
-                                    # print(pic[0])
-                        print('-----------------------')
-
                         if picture != []:
                             users.append(pic[1])
                             posts.append(picture[0])
@@ -1871,6 +1874,13 @@ def gen_all():
 @app.route("/logout")
 @is_logged_in
 def logout():
+
+    id = session.get("USER")
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor = cnx.cursor()
+        # PDATE users SET `registered`=TRUE WHERE `username`='{username[0]
+        cursor.execute(f"UPDATE status SET `status`='offline' WHERE `user_id`='{id}'")
+        cnx.commit()
     session.pop('user',None)
     session.clear()
     res = make_response("Cookie Removed")
@@ -2010,7 +2020,7 @@ def save_picture(form_picture):
         print(f"This is the length {picture}")
         print(f"just checking {len(picture)}")
             
-        if picture[0] <= 6:
+        if picture[0] <= 5:
             cursor.execute(
                 f"""INSERT INTO 
                 `pictures`(`pictures_id`,`user_id`,`picture`)
@@ -2170,10 +2180,8 @@ def post(post_id):
 
         id = session.get("USER")
 
+
         
-
-
-
         with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
             cursor=cnx.cursor()
 
@@ -2187,7 +2195,19 @@ def post(post_id):
 
             cursor.execute(f"SELECT * FROM `users` WHERE `username`= '{user}'")
             check_token = cursor.fetchone()
+        
+        # print(f"{existing_user[0]} this is what i am printing")
+        # print(f"{}###################################################$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
+        
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+
+            cursor.execute(f"SELECT `status` FROM `status` WHERE `user_id`='{check_token[0]}'")
+
+            status = cursor.fetchone()
+
+        print(f"{status[0]} this is the shit ***********&&&&&&&&&&&&")
         # with sqlmgr(user="root", pwd="",db='Matcha') as cnx:
         #     cursor = cnx.cursor()
 
@@ -2232,7 +2252,7 @@ def post(post_id):
 
 
 
-        return render_template('public/post.html',picture=picture,post=post,city=city,author=author,notification=existing_user[-2],notification_numb=existing_user[-1])
+        return render_template('public/post.html',status=status,picture=picture,post=post,city=city,author=author,notification=existing_user[-2],notification_numb=existing_user[-1])
     else:
         pass
 
@@ -2256,11 +2276,36 @@ def update_post(post_id):
 @app.route("/post/<string:post_id>/delete",methods=['POST',])
 def delete_post(post_id):
     # id = str(post_id)
-    id = post_id
-    post = find_post(id)
-    id = post['author']
-    picture = post_id
-    delete_existing_post(id,picture)
+    # id = post_id
+    id = session.get("USER")
+
+    # print(f"{id} this is the users position")
+
+    r_id =secrets.token_urlsafe()
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor = cnx.cursor()
+        cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS `reports`(
+        r_id VARCHAR(100) ,
+        user_id VARCHAR(200) NOT NULL,
+        username TEXT NOT NULL,
+        status TEXT NOT NULL, 
+        PRIMARY KEY(user_id),
+        FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+        )
+        """
+        )
+        cnx.commit()
+
+    with sqlmgr(user="root",pwd="",db="Matcha") as cnx:
+        cursor = cnx.cursor()
+        cursor.execute(f"INSERT IGNORE INTO `reports`(`r_id`,`user_id`,`username`,`status`) VALUES('{r_id}','{id}','{post_id}','Reported')")
+        cnx.commit()
+    # post = find_post(id)
+    # id = post['author']
+    # picture = post_id
+    # delete_existing_post(id,picture)
     # print(selected)
 
     # post = find_blog_post(id)

@@ -23,12 +23,13 @@
                           {% for i in picture %}
                           <h6> <img  id="profle" class="rounded-circle " src="{{ url_for('static',filename='img/'+i[-1])}}" alt="" height="100" width="100" class="img-fluid img-thumbnail"></h6>
                           {% endfor %}
-                          <h6><b>User:</b> {{ post[1] }}</h6>
-                          <p></p><b>Bio:</b>{{ post[7] }}</p>
-                          <h6><b>Age:</b>{{ post[6] }}</h6>
-                          <h6><b>Gender:</b>{{ post[10] }}</h6>
-                          <h6><b>City:</b>{{ city[-1] }}</h6>
-                          <h6><b>SexualPreference:</b>{{ post[11] }}</h6>
+                          <h6><b>Status: </b>{{ status[0] }}</h6>
+                          <h6><b>User: </b> {{ post[1] }}</h6>
+                          <p></p><b>Bio: </b>{{ post[7] }}</p>
+                          <h6><b>Age: </b>{{ post[6] }}</h6>
+                          <h6><b>Gender: </b>{{ post[10] }}</h6>
+                          <h6><b>City: </b>{{ city[-1] }}</h6>
+                          <h6><b>SexualPreference: </b>{{ post[11] }}</h6>
                           <!-- <h6><b>Age:</b>{{ post.age }}</h6> -->
                         </td>
                                                 
@@ -56,8 +57,8 @@
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                          <form action="{{ url_for('delete_post',post_id=posts) }}" method="POST">
-                            <input class="btn btn-danger" type="submit" value="Delete">
+                          <form action="{{ url_for('delete_post',post_id=post[1]) }}" method="POST">
+                            <input class="btn btn-danger" type="submit" value="Confirm">
                           </form>
                         </div>
                       </div>
