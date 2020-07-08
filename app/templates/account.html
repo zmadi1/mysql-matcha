@@ -1,6 +1,8 @@
 {% extends 'layout.html' %}
     
 {% block content %}
+<!--custom css-->
+<link rel="stylesheet" href="tagify.css" rel="stylesheet"/>
     <div class="content-section">
       
         <!--
@@ -16,6 +18,7 @@
         </div>
          -->
     <div class="content-section">
+
             <form method="POST" action="/account">
                 <!--this add the csrf-->
                 {{ form.hidden_tag() }}

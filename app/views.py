@@ -2126,44 +2126,77 @@ def new_post():
 
 @app.route("/post/<string:post_id>")
 def post(post_id):
+    
     user =post_id
-    # id = str(post_id)
-    # print(id)
 
-    id = session.get("USER")
+    if user != 'tagify.css':
+        print(f"{user}^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^))))))))))))))))))))))))))))))))0")
+        # id = str(post_id)
+        # print(id)
 
-    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        cursor=cnx.cursor()
-        
-        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
-        existing_user = cursor.fetchone()
+        id = session.get("USER")
+
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
+
+            cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+            existing_user = cursor.fetchone()
 
 
 
-    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        cursor=cnx.cursor()
-    
-        cursor.execute(f"SELECT * FROM `users` WHERE `username`= '{user}'")
-        check_token = cursor.fetchone()
+        with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+            cursor=cnx.cursor()
 
-    print(f"%%%%%%%%%%%%%%%%%%%%%{check_token}")
-    post=check_token
-    author=check_token
+            cursor.execute(f"SELECT * FROM `users` WHERE `username`= '{user}'")
+            check_token = cursor.fetchone()
 
-    # print(check_token)
+        # with sqlmgr(user="root", pwd="",db='Matcha') as cnx:
+        #     cursor = cnx.cursor()
 
-    # id = post['_id']
+        #     cursor.execute(f"SELECT * FROM `users` WHERE user_id ='{user}'")
+        #     users = cursor.fetchone()
 
-    # author = find_blog_post(id)
+        # for i in users:
 
-    # print(type(author))
-    # for pic in author:
-        # print(pic)
-    
+        # print(f"%%%%%%%%%%%%%%%%%%%%%{check_token}")
+        post=check_token
+        token=check_token
+        if post is not None:
+            print(f"{post[0]} check this works")
+            with sqlmgr(user="root", pwd="",db='Matcha') as cnx:
+                cursor = cnx.cursor()
 
-    
+                cursor.execute(f"SELECT * FROM `location` WHERE user_id ='{post[0]}'")
+                city = cursor.fetchone()
 
-    return render_template('public/post.html',post=post,author=author,notification=existing_user[-2],notification_numb=existing_user[-1])
+
+            with sqlmgr(user="root", pwd="",db='Matcha') as cnx:
+                cursor = cnx.cursor()
+
+                cursor.execute(f"SELECT * FROM `pictures` WHERE user_id ='{token[0]}'")
+                picture = cursor.fetchall()
+
+
+            author=check_token
+
+            # print(picture[])
+
+            # print(check_token)
+
+            # id = post['_id']
+
+            # author = find_blog_post(id)
+
+            # print(type(author))
+            # for pic in author:
+            # print(pic)
+
+
+
+
+        return render_template('public/post.html',picture=picture,post=post,city=city,author=author,notification=existing_user[-2],notification_numb=existing_user[-1])
+    else:
+        pass
 
 
 
