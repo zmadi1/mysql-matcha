@@ -2207,16 +2207,24 @@ def post(post_id):
 
             status = cursor.fetchone()
 
-        print(f"{status[0]} this is the shit ***********&&&&&&&&&&&&")
-        # with sqlmgr(user="root", pwd="",db='Matcha') as cnx:
-        #     cursor = cnx.cursor()
+        # print(f"{status[0]} this is the shit ***********&&&&&&&&&&&&")
+        with sqlmgr(user="root", pwd="",db='Matcha') as cnx:
+            cursor = cnx.cursor()
 
-        #     cursor.execute(f"SELECT * FROM `users` WHERE user_id ='{user}'")
-        #     users = cursor.fetchone()
+            cursor.execute(f"SELECT username FROM `likes` WHERE username ='{user}'")
+            fame = cursor.fetchall()
 
+        if len(fame) < 6: # 1 - 5 likes
+            fame = 'Low  (liked by an estimated 5 users)'
+        elif len(fame) < 16: # 6 - 20 likes
+            fame = 'Average  (liked by an estimated 15 users)'
+        elif len(fame) < 31: # 6 - 20 likes
+            fame = 'Popular  (liked by an estimated 30 users)'
+        else:
+            fame = 'Socialite  (liked by over 50 users)'
         # for i in users:
 
-        # print(f"%%%%%%%%%%%%%%%%%%%%%{check_token}")
+        print(fame)
         post=check_token
         token=check_token
         if post is not None:
@@ -2252,7 +2260,7 @@ def post(post_id):
 
 
 
-        return render_template('public/post.html',status=status,picture=picture,post=post,city=city,author=author,notification=existing_user[-2],notification_numb=existing_user[-1])
+        return render_template('public/post.html',status=status,picture=picture,post=post,city=city,author=author,notification=existing_user[-2],notification_numb=existing_user[-1],fame=fame)
     else:
         pass
 
