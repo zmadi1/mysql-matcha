@@ -2074,6 +2074,13 @@ def account():
     city = form.city.data
     sexualPreference = form.sexualPreference.data
 
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+                
+        cursor.execute(f"SELECT `city` FROM `location` WHERE `user_id`= '{id}'") 
+        current_location = cursor.fetchall()
+    print(current_location)
+    
     try:
         if check_where():
             with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
@@ -2126,6 +2133,10 @@ def account():
                     upd_sexual(form)
                 else:
                     flash('Sexual preference selection is incorrect.', 'danger')
+                if check_first_last_name(city):
+                    upd_city(form)
+                else:
+                    flash('City preference is incorrect.', 'danger')
                 if form.picture.data:
                     picture_file = save_picture(form.picture.data)
         else:

@@ -44,7 +44,7 @@ class UploadsForm(FlaskForm):
     sexualPreference = RadioField('SexualPreference',choices=[('Male','Male'),('Female','Female'),('Bisexual','Bisexual')])
     bio = TextAreaField('Biography')
     interest = StringField('Interest')
-    city = StringField('City')
+    city = StringField('New City')
     picture = FileField('Upload picture')
     submit = SubmitField('Update')
 
