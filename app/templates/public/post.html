@@ -20,10 +20,14 @@
                     <tr valign="top">
                       <div class="container">
                         <td>
+                          {% for i in picture %}
+                          <h6> <img  id="profle" class="rounded-circle " src="{{ url_for('static',filename='img/'+i[-1])}}" alt="" height="100" width="100" class="img-fluid img-thumbnail"></h6>
+                          {% endfor %}
                           <h6><b>User:</b> {{ post[1] }}</h6>
                           <p></p><b>Bio:</b>{{ post[7] }}</p>
                           <h6><b>Age:</b>{{ post[6] }}</h6>
                           <h6><b>Gender:</b>{{ post[10] }}</h6>
+                          <h6><b>City:</b>{{ city[-1] }}</h6>
                           <h6><b>SexualPreference:</b>{{ post[11] }}</h6>
                           <!-- <h6><b>Age:</b>{{ post.age }}</h6> -->
                         </td>
