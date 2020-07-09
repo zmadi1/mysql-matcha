@@ -1,18 +1,16 @@
+{% include 'public/templates/navbar.html' %}
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-body {
-  margin: 0 auto;
-  max-width: 800px;
-  padding: 0 20px;
-}
-
-.container {
-  border: 2px solid #dedede;
-  background-color: #f1f1f1;
+{% extends 'public/templates/public_templates.html'%}
+{% block main %}
+<style>
+  body {
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
   border-radius: 5px;
   padding: 10px;
   margin: 10px 0;
@@ -52,14 +50,9 @@ body {
   float: left;
   color: #999;
 }
-</style>
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 
-<script src="{{ url_for('static',filename='js/socketio.js')}}"></script>
-</head>
-<body>
+</style>
+<div style="max-width: 100%;">{% block notify %}{% endblock %}</div>
     
     <h2>Chat Messages</h2>
 
@@ -92,8 +85,4 @@ body {
     </div>
 
 
-
-
-
-</body>
-</html>
+    {% endblock %}

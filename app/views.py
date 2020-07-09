@@ -335,12 +335,26 @@ def message():
 
 
     form = MessageForm()
-
+    
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
-        cursor=cnx.cursor()
+                cursor=cnx.cursor()
+        
+                cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+                existing = cursor.fetchone()
+    
+                notification = existing[-2]
+            # existing_blog_post = find_blog_post(id_)
+    # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+    #     cursor=cnx.cursor()
+        
+    #     cursor.execute(find_user_by_id(id))
+    #     existing_user = cursor.fetchone()
 
-        cursor.execute(f"SELECT `username` FROM `likes` WHERE `user_id`='{id}'")
-        existing_user = cursor.fetchall()
+    # with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+    #     cursor=cnx.cursor()
+
+    #     cursor.execute(f"SELECT `username` FROM `likes` WHERE `user_id`='{id}'")
+    #     existing_user = cursor.fetchall()
     # print(existing_user)
 
     with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
@@ -519,7 +533,7 @@ def message():
     # msg = collection()
 
 
-    return render_template('public/chat.html',rooms=rooms,user=user[0][0])
+    return render_template('public/chat.html',rooms=rooms,user=user[0][0],post=post,notification_numb=existing[-1],form=form,notification=notification)
 
 def collection():
     user = session.get('USER')
@@ -843,6 +857,13 @@ def jinja():
     # notification_numb = existing_user['notification']
 
     # insert_notification(id,notification_numb)
+    with sqlmgr(user="root",pwd="",db='Matcha') as cnx:
+        cursor=cnx.cursor()
+        
+        cursor.execute(f"SELECT * FROM `users` WHERE `user_id`= '{id}'") 
+        existing = cursor.fetchone()
+    
+        notification = existing[-2]
 
     my_name = 'madi'
 
@@ -892,7 +913,7 @@ def jinja():
     suspicious = '<script>alert("YOU GOT HACKED")</script>'
 
     return render_template('public/jinja.html',notification_numb=existing_user[-1],Profile=Profile,suspicious=suspicious,my_html=my_html,date=date,age= age,cool=cool,my_remote=my_remote ,my_name= my_name,
-    langs=langs,friends=friends,colours=colours,gitremote=gitremote,repeat=repeat
+    langs=langs,friends=friends,colours=colours,notification=notification,gitremote=gitremote,repeat=repeat
     )
 
 @app.route('/sign-up',methods=['GET','POST'])

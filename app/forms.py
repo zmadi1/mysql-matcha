@@ -2,7 +2,6 @@ from app import app
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField,SubmitField,FloatField, BooleanField, PasswordField,RadioField, IntegerField,TextAreaField
-from wtforms.validators import DataRequired, Length,Email,EqualTo
 
 class RegistrationForm(FlaskForm):
     username =StringField('Username')
@@ -50,11 +49,11 @@ class UploadsForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    title = StringField('Title',validators=[DataRequired(),])
-    content = TextAreaField('Content',validators=[DataRequired()])
+    title = StringField('Title')
+    content = TextAreaField('Content')
     submit = SubmitField('Post')
 
 class MessageForm(FlaskForm):
     username = StringField('Username')
-    content = TextAreaField('Content',validators=[DataRequired()])
+    content = TextAreaField('Content')
     submit = SubmitField('send')
