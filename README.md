@@ -31,3 +31,8 @@ $ sudo mysql
 > exit or ctrl+D
 
 That should resolve the error.
+
+# 500 Users
+To create 500 dummy user accounts:
+
+$ sudo mysql < populate_db.sql 
