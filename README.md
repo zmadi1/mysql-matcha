@@ -33,6 +33,6 @@ $ sudo mysql
 That should resolve the error.
 
 # 500 Users
-To create 500 dummy user accounts:
+To create 500 dummy user accounts (NOTE: the script can only be successfully executed if at least one user was created manually within the app):
 
 $ sudo mysql < populate_db.sql 
