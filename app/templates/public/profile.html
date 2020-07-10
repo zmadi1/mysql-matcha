@@ -30,6 +30,35 @@
 
     </div> 
     <div class="row">
+        {% if madness %}
+        <div class="col-md-12">
+            <div class="container">      
+           
+                <article class="media content-section">
+                    <div class="media">
+                        <div class="media-body" style="overflow-x:auto;">  
+                           
+                            {% for user in  posts %}
+                          
+                            <h5>
+                                {{users[loop.index - 1 ]}}
+                            </h5>
+                            <a href="{{ url_for('post',post_id=users[loop.index - 1]) }}" id="{{users[loop.index - 1]}}" class="link" ><img  id="profle" class="rounded-circle " src="{{ url_for('static',filename='img/'+user[0])}}" alt="" height="100" width="100" class="img-fluid img-thumbnail"></a>
+                            <button name="{{users[loop.index - 1]}}" value="{{existing_user[1]}}" id="like"  type="button" class="btn btn-success"><i class="fa fa-heart"></i></button>
+                            <button name="{{ users[loop.index - 1] }}" value="{{existing_user[1]}}" id="dislike" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>                            
+                            {% endfor %}
+                          
+                           
+                            </div>
+                        </div>    
+                    </div>
+                </article>
+                <script>
+                    const username = `{{existing_user[1]}}`
+                    console.log(username)
+                </script>
+            </div>
+        {% else %}
         <div class="col-md-8">
             <div class="container">      
            
@@ -57,6 +86,7 @@
                     console.log(username)
                 </script>
             </div>
+            {% endif %}
             {% if madness %}
             <p></p> 
             {% else %}
