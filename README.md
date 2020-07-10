@@ -8,6 +8,13 @@ source magic/bin/activate
 
 pip install -r requirements.txt
 
+python3 setup.py #see Troubleshooting section if this fails.
+
+# 500 Users
+To create 500 dummy user accounts:
+
+$ sudo mysql < populate_db.sql
+
 # Running
 
 export FLASK_APP=run.py
@@ -31,8 +38,4 @@ $ sudo mysql
 > exit or ctrl+D
 
 That should resolve the error.
-
-# 500 Users
-To create 500 dummy user accounts (NOTE: the script can only be successfully executed if at least one user was created manually within the app):
-
-$ sudo mysql < populate_db.sql 
+ 
