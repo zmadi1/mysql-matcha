@@ -1,6 +1,6 @@
 import mysql.connector
 
-s = URLSafeTimedSerializer('thisissecret')
+# s = URLSafeTimedSerializer('thisissecret')
 class sqlmgr:
     #initialize parameters for connection estaablishment
     def __init__(self,user,pwd,db,host='localhost',IgnoreError=False):
@@ -121,6 +121,25 @@ with sqlmgr(user='root',pwd='',db='Matcha') as cnx:
             PRIMARY KEY(likes_id),
             status VARCHAR(100) NOT NULL,
             epoch VARCHAR(250) NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES `users`(user_id)
+            )
+        """
+        )
+        cnx.commit()
+    except mysql.connector.errors.IntegrityError as err:
+        print(err)
+        raise
+
+    try:
+        cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS `location`(
+            gis_id VARCHAR(100) ,
+            user_id VARCHAR(200) NOT NULL,
+            lat FLOAT NOT NULL,
+            lon FLOAT NOT NULL,
+            city TEXT NOT NULL,
+            PRIMARY KEY(gis_id),
             FOREIGN KEY(user_id) REFERENCES `users`(user_id)
             )
         """
