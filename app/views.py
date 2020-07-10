@@ -1136,48 +1136,50 @@ def check_where():
 def registration():
     form=RegistrationForm()
 
-    if request.method =='POST':
-        email = form.email.data
-        username = form.username.data
-        firstname = form.firstname.data
-        lastname = form.lastname.data
-        password = form.password.data
-        confirm_password = form.confirm_password.data
+    try:
+        if request.method =='POST':
+            email = form.email.data
+            username = form.username.data
+            firstname = form.firstname.data
+            lastname = form.lastname.data
+            password = form.password.data
+            confirm_password = form.confirm_password.data
 
-        if check_username(username):
-            if check_first_last_name(firstname):
-                if check_first_last_name(lastname):
-                    if check_mail(email):
-                        if check_passwd(password):
-                            if confirm_password == password:
-                                if create_users(form):
-                                    token = session.get("TOKEN")
-                                    msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
+            if check_username(username):
+                if check_first_last_name(firstname):
+                    if check_first_last_name(lastname):
+                        if check_mail(email):
+                            if check_passwd(password):
+                                if confirm_password == password:
+                                    if create_users(form):
+                                        token = session.get("TOKEN")
+                                        msg = Message('Confirm Email',sender='Matcha dating services', recipients=[email])
         
-                                    link  = url_for('confirm_email',token=token, _external=True)
-        
-                                    msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
+                                        link  = url_for('confirm_email',token=token, _external=True)
+    
+                                        msg.body=f"Your link is '<a><p><a href='{link}'>'{ link }'</a></p></a>'"
 
-                                    mail.send(msg)
+                                        mail.send(msg)
 
-                                    return redirect(url_for('login'))
+                                        return redirect(url_for('login'))
+                                else:
+                                    flash('The two passwords provided do not match, please try again.', 'danger')
                             else:
-                                flash('The two passwords provided do not match, please try again.', 'danger')
+                                flash('The password field should have at least one number', 'danger')
+                                flash('At least one uppercase and one lowercase character', 'danger')
+                                flash('At least one special symbol and be between 6 to 20 characters long', 'danger')
+                                flash('Be between 6 to 20 characters long, please try again', 'danger')
                         else:
-                            flash('The password field should have at least one number', 'danger')
-                            flash('At least one uppercase and one lowercase character', 'danger')
-                            flash('At least one special symbol and be between 6 to 20 characters long', 'danger')
-                            flash('Be between 6 to 20 characters long, please try again', 'danger')
+                            flash('The email address is invalid, please try again','danger')
                     else:
-                        flash('The email address is invalid, please try again','danger')
+                        flash('The lastname field must be between 2 to 30 characters long and can only contain English alphabet characters, please try again', 'danger')
                 else:
-                    flash('The lastname field must be between 2 to 30 characters long and can only contain English alphabet characters, please try again', 'danger')
+                    flash('The firstname field must be between 2 to 30 characters long and can only contain English alphabet characters, please try again', 'danger')    
             else:
-                flash('The firstname field must be between 2 to 30 characters long and can only contain English alphabet characters, please try again', 'danger')    
-        else:
-            flash('The username field must be between 2 to 30 characters long and can be AlphaNumeric, please try again', 'danger')                     
+                flash('The username field must be between 2 to 30 characters long and can be AlphaNumeric, please try again', 'danger')                     
+    except:
+        flash('Internal error, we have a problem with our SNMP server and are unable to complete your registration at this time. Please try again later.', 'danger')
     return render_template('public/registration.html',form=form,title='SignUp')
-
 
 #email verification
 @app.route('/confirm_email/<token>')
